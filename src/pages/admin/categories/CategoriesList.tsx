@@ -35,7 +35,7 @@ export default function CategoriesList() {
 
   const openEdit = (cat: Category) => {
     setEditing(cat)
-    setForm({ name: cat.name, description: cat.description ?? '', isActive: cat.isActive })
+    setForm({ name: cat.name, description: cat.description ?? '', isActive: cat.active })
     setShowForm(true)
   }
 
@@ -91,8 +91,8 @@ export default function CategoriesList() {
                     <td><strong>{cat.name}</strong></td>
                     <td>{cat.description ?? '—'}</td>
                     <td>
-                      <span className={`badge ${cat.isActive ? 'badge-green' : 'badge-red'}`}>
-                        {cat.isActive ? 'Active' : 'Inactive'}
+                      <span className={`badge ${cat.active ? 'badge-green' : 'badge-red'}`}>
+                        {cat.active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td>

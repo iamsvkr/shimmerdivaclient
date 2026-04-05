@@ -4,7 +4,7 @@ export interface Material {
   id: number
   name: string
   description?: string
-  isActive: boolean
+  active: boolean
 }
 
 export interface MaterialRequest {

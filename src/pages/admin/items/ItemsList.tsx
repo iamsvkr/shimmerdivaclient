@@ -107,8 +107,8 @@ export default function ItemsList() {
                     <td>₹{item.price?.toLocaleString()}</td>
                     <td>{item.discountPrice ? `₹${item.discountPrice.toLocaleString()}` : '—'}</td>
                     <td>
-                      <span className={`badge ${item.isActive ? 'badge-green' : 'badge-red'}`}>
-                        {item.isActive ? 'Active' : 'Inactive'}
+                      <span className={`badge ${item.active ? 'badge-green' : 'badge-red'}`}>
+                        {item.active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td>

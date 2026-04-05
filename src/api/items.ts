@@ -23,7 +23,7 @@ export interface Item {
   materialId?: number
   materialName?: string
   tags?: string
-  isActive: boolean
+  active: boolean
   images?: ItemImage[]
   variants?: ItemVariant[]
   averageRating?: number

@@ -35,7 +35,7 @@ export default function MaterialsList() {
 
   const openEdit = (mat: Material) => {
     setEditing(mat)
-    setForm({ name: mat.name, description: mat.description ?? '', isActive: mat.isActive })
+    setForm({ name: mat.name, description: mat.description ?? '', isActive: mat.active })
     setShowForm(true)
   }
 
@@ -91,8 +91,8 @@ export default function MaterialsList() {
                     <td><strong>{mat.name}</strong></td>
                     <td>{mat.description ?? '—'}</td>
                     <td>
-                      <span className={`badge ${mat.isActive ? 'badge-green' : 'badge-red'}`}>
-                        {mat.isActive ? 'Active' : 'Inactive'}
+                      <span className={`badge ${mat.active ? 'badge-green' : 'badge-red'}`}>
+                        {mat.active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td>
