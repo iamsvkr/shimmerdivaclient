@@ -4,7 +4,7 @@
   "description": "",
   "main": "move-dist.js",
   "scripts": {
-    "prepush": "cd clientApp && npm run build && cd .. && node move-dist.js && git add . && git commit -m 'Update dist files' && git push"
+    "prepush": "cd clientApp && npm run build && cd .. && node move-dist.js && git add . && git commit -m \"Update dist files\" && git push"
   },
   "repository": {
     "type": "git",
