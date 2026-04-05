@@ -5,6 +5,7 @@ import { App } from "./App"
 import { store } from "./app/store"
 import "./index.css"
 import "./styles/admin.css"
+import "./styles/public.css"
 import { BrowserRouter } from 'react-router-dom'
 
 const container = document.getElementById("root")

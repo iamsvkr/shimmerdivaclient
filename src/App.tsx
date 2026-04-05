@@ -1,6 +1,18 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
+
+// Public
+import PublicLayout from './pages/public/PublicLayout'
+import Home from './pages/public/Home'
+import Shop from './pages/public/Shop'
+import ItemDetail from './pages/public/ItemDetail'
+import Cart from './pages/public/Cart'
+import Checkout from './pages/public/Checkout'
+
+// Auth
 import Login from './pages/Login'
+
+// Admin
 import AdminLayout from './pages/admin/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import ItemsList from './pages/admin/items/ItemsList'
@@ -13,7 +25,19 @@ import ReviewsList from './pages/admin/reviews/ReviewsList'
 
 export const App = () => (
   <Routes>
+    {/* Public storefront */}
+    <Route element={<PublicLayout />}>
+      <Route path="/" element={<Home />} />
+      <Route path="/shop" element={<Shop />} />
+      <Route path="/item/:id" element={<ItemDetail />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
+    </Route>
+
+    {/* Auth */}
     <Route path="/login" element={<Login />} />
+
+    {/* Admin panel */}
     <Route
       path="/admin"
       element={
@@ -31,6 +55,7 @@ export const App = () => (
       <Route path="promocodes" element={<PromoCodesList />} />
       <Route path="reviews" element={<ReviewsList />} />
     </Route>
-    <Route path="*" element={<Navigate to="/admin" replace />} />
+
+    <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 )
