@@ -99,6 +99,7 @@ export default function PublicLayout() {
                 <li><a href="#">Care Instructions</a></li>
                 <li><a href="#">Shipping Info</a></li>
                 <li><a href="#">Returns Policy</a></li>
+                <li><Link to="/login">Admin login</Link></li>
               </ul>
             </div>
             <div className="footer-col">
