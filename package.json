@@ -1,0 +1,21 @@
+{
+  "name": "shimmerdivaclient",
+  "version": "1.0.0",
+  "description": "",
+  "main": "move-dist.js",
+  "scripts": {
+    "prepush": "cd clientApp && npm run build && cd .. && node move-dist.js && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamsvkr/shimmerdivaclient.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/iamsvkr/shimmerdivaclient/issues"
+  },
+  "homepage": "https://github.com/iamsvkr/shimmerdivaclient#readme"
+}
