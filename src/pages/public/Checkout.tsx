@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { clearCart, selectCartTotal } from '../../features/cart/cartSlice'
 
@@ -45,7 +45,6 @@ const formatExpiry = (val: string) => {
 
 export default function Checkout() {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
   const items = useAppSelector((state) => state.cart.items)
   const subtotal = useAppSelector(selectCartTotal)
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE
