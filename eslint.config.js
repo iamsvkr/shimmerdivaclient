@@ -12,6 +12,7 @@ const eslintConfig = config(
     ignores: [
       "**/*.snap",
       "**/dist/",
+      "**/docs/",
       "**/.yalc/",
       "**/build/",
       "**/temp/",

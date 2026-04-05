@@ -25,4 +25,12 @@ export default defineConfig({
     watch: false,
     setupFiles: ["./src/setupTests.ts"],
   },
+
+  build: {
+    // Specify the new output directory (e.g., 'build' instead of 'dist')
+    outDir: 'docs',
+    
+    // Optional: Empty the directory before building (defaults to true if outDir is inside root)
+    emptyOutDir: true,
+  },
 })
