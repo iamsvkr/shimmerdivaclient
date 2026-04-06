@@ -98,6 +98,7 @@ button { font-family: 'Inter', sans-serif; cursor: pointer; }
   display: flex;
   gap: 32px;
   list-style: none;
+  place-items: center;
 }
 
 .navbar-links a {
