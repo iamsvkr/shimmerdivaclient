@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '../../app/hooks'
 import { logout } from '../../features/auth/authSlice'
@@ -16,15 +17,22 @@ const navItems = [
 export default function AdminLayout() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleLogout = () => {
     dispatch(logout())
     navigate('/login')
   }
 
+  const closeSidebar = () => setSidebarOpen(false)
+
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar">
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={closeSidebar} />
+      )}
+
+      <aside className={`admin-sidebar${sidebarOpen ? ' sidebar-open' : ''}`}>
         <div className="sidebar-brand">✦ Shimmer Diva</div>
         <nav className="sidebar-nav">
           {navItems.map((item) => (
@@ -33,6 +41,7 @@ export default function AdminLayout() {
               to={item.to}
               end={item.end}
               className={({ isActive }) => (isActive ? 'active' : '')}
+              onClick={closeSidebar}
             >
               <span>{item.icon}</span>
               {item.label}
@@ -48,6 +57,15 @@ export default function AdminLayout() {
 
       <div className="admin-main">
         <div className="admin-topbar">
+          <button
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen((o) => !o)}
+            aria-label="Toggle menu"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
           <span style={{ fontSize: 14, color: '#888' }}>Admin Panel</span>
         </div>
         <main className="admin-content">
