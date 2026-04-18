@@ -112,12 +112,64 @@ export default function Checkout() {
         dispatch(clearCart())
         setSuccess(true)
       } else {
-        // For online payments, create Razorpay order
-        const orderResponse = await paymentApi.createOrder({
-          orderId: 0, // Optional - will be set later when order is placed
+        // For online payments, follow this sequence:
+        // 1. Save address → get addressId
+        // 2. Place order → get orderId
+        // 3. Create Razorpay order with orderId → razorpayId is saved to DB
+        // 4. Verify payment → finds order by razorpayId
+
+        // Step 1: Save address
+        const token = localStorage.getItem('token')
+        if (!token) {
+          throw new Error('User not authenticated. Please login again.')
+        }
+
+        const addressResponse = await fetch('/api/v1/addresses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+          },
+          body: JSON.stringify({
+            line1: address.street,
+            line2: '',
+            city: address.city,
+            state: address.state,
+            pincode: address.zipCode,
+            country: address.country,
+            isDefault: true,
+          }),
+        }).then((res) => {
+          if (!res.ok) throw new Error('Failed to save address')
+          return res.json()
+        })
+
+        const addressId = addressResponse.id
+
+        // Step 2: Place order
+        const orderResponse = await fetch('/api/v1/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+          },
+          body: JSON.stringify({
+            addressId: addressId,
+            promoCode: '', // Add if available
+          }),
+        }).then((res) => {
+          if (!res.ok) throw new Error('Failed to place order')
+          return res.json()
+        })
+
+        const dbOrderId = orderResponse.id
+
+        // Step 3: Create Razorpay order with DB orderId
+        const razorpayOrderResponse = await paymentApi.createOrder({
+          orderId: dbOrderId,
           amount: total,
           currency: 'INR',
-          receipt: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          receipt: `order_${dbOrderId}`,
           notes: {
             userEmail: address.email,
             fullName: address.fullName,
@@ -129,8 +181,9 @@ export default function Checkout() {
         const keyData = await paymentApi.getRazorpayKey()
         const razorpayKeyId = keyData.keyId
 
+        // Step 4: Initiate payment
         initiateRazorpayPayment(
-          orderResponse.razorpayId,
+          razorpayOrderResponse.razorpayId,
           razorpayKeyId,
           total,
           address.email,
