@@ -118,17 +118,10 @@ export default function Checkout() {
         // 3. Create Razorpay order with orderId → razorpayId is saved to DB
         // 4. Verify payment → finds order by razorpayId
 
-        // Step 1: Save address
-        const token = localStorage.getItem('token')
-        if (!token) {
-          throw new Error('User not authenticated. Please login again.')
-        }
-
         const addressResponse = await fetch('/api/v1/addresses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': token,
           },
           body: JSON.stringify({
             line1: address.street,
@@ -151,7 +144,6 @@ export default function Checkout() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': token,
           },
           body: JSON.stringify({
             addressId: addressId,
