@@ -125,13 +125,7 @@ export default function Checkout() {
         })
 
         // Fetch Razorpay key safely from backend
-        const keyResponse = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/payment/key`,
-        )
-        if (!keyResponse.ok) {
-          throw new Error('Failed to fetch payment configuration')
-        }
-        const keyData = await keyResponse.json()
+        const keyData = await paymentApi.getRazorpayKey()
         const razorpayKeyId = keyData.keyId
 
         initiateRazorpayPayment(
