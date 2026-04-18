@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { clearCart, selectCartTotal } from '../../features/cart/cartSlice'
+import { paymentApi, initiateRazorpayPayment } from '../../api/payment'
 
 const SHIPPING_THRESHOLD = 999
 const SHIPPING_FEE = 99
@@ -54,6 +55,7 @@ export default function Checkout() {
   const [placing, setPlacing] = useState(false)
   const [success, setSuccess] = useState(false)
   const [orderId] = useState(() => Math.floor(100000 + Math.random() * 900000))
+  const [paymentError, setPaymentError] = useState('')
 
   const [address, setAddress] = useState<AddressForm>({
     fullName: '', email: '', phone: '',
@@ -101,11 +103,72 @@ export default function Checkout() {
     e.preventDefault()
     if (!validate()) return
     setPlacing(true)
-    // Simulate payment processing
-    await new Promise((r) => setTimeout(r, 2000))
-    dispatch(clearCart())
-    setSuccess(true)
-    setPlacing(false)
+    setPaymentError('')
+
+    try {
+      if (paymentMethod === 'cod') {
+        // For COD, skip Razorpay and directly complete order
+        await new Promise((r) => setTimeout(r, 1000))
+        dispatch(clearCart())
+        setSuccess(true)
+      } else {
+        // For online payments, create Razorpay order
+        const orderResponse = await paymentApi.createOrder({
+          amount: total,
+          currency: 'INR',
+          receipt: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          notes: {
+            userEmail: address.email,
+            fullName: address.fullName,
+            phone: address.phone,
+          },
+        })
+
+        // Fetch Razorpay key safely from backend
+        const keyResponse = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/payment/key`,
+        )
+        if (!keyResponse.ok) {
+          throw new Error('Failed to fetch payment configuration')
+        }
+        const keyData = await keyResponse.json()
+        const razorpayKeyId = keyData.keyId
+
+        initiateRazorpayPayment(
+          orderResponse.id,
+          razorpayKeyId,
+          total,
+          address.email,
+          address.phone,
+          async (response) => {
+            try {
+              // Verify payment on backend
+              await paymentApi.handlePaymentSuccess({
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              })
+              dispatch(clearCart())
+              setSuccess(true)
+            } catch (error) {
+              console.error('Payment verification failed:', error)
+              setPaymentError('Payment verification failed. Please contact support.')
+            } finally {
+              setPlacing(false)
+            }
+          },
+          (error) => {
+            console.error('Payment failed:', error)
+            setPaymentError('Payment cancelled or failed. Please try again.')
+            setPlacing(false)
+          },
+        )
+      }
+    } catch (error) {
+      console.error('Order creation failed:', error)
+      setPaymentError(error instanceof Error ? error.message : 'An error occurred. Please try again.')
+      setPlacing(false)
+    }
   }
 
   if (items.length === 0 && !success) {
@@ -465,6 +528,20 @@ export default function Checkout() {
                     <span>Total</span>
                     <span>₹{(total + (paymentMethod === 'cod' ? 40 : 0)).toLocaleString()}</span>
                   </div>
+
+                  {paymentError && (
+                    <div style={{
+                      padding: '12px 16px',
+                      background: '#ffebee',
+                      color: '#c62828',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: 13,
+                      marginBottom: 16,
+                      border: '1px solid #ef5350',
+                    }}>
+                      ⚠️ {paymentError}
+                    </div>
+                  )}
 
                   <button
                     type="submit"
