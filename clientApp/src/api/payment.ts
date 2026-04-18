@@ -15,6 +15,7 @@ export interface RazorpayOrderResponse {
 }
 
 export interface PaymentDetails {
+  orderId?: number  // Optional: Database Order ID
   amount: number
   currency?: string
   receipt?: string
@@ -22,29 +23,44 @@ export interface PaymentDetails {
 }
 
 export interface PaymentVerificationPayload {
-  orderId: string
-  paymentId: string
-  signature: string
+  razorpayId: string
+  razorpayPaymentId: string
+  razorpaySignature: string
+}
+
+export interface PaymentOrderResponse {
+  status: string
+  dbOrderId?: number
+  razorpayId: string
+  amount: number
+  currency: string
+  receipt: string
+  razorpayKeyId: string
+  message: string
 }
 
 export const paymentApi = {
   /**
-   * Create Razorpay order on backend
+   * Create Razorpay order on backend (optional database orderId)
    */
-  createOrder: async (details: PaymentDetails): Promise<RazorpayOrderResponse> => {
-    return api.post<RazorpayOrderResponse>('/api/payment/create-order', {
+  createOrder: async (details: PaymentDetails): Promise<PaymentOrderResponse> => {
+    const payload: Record<string, unknown> = {
       amount: details.amount,
       currency: details.currency || 'INR',
       receipt: details.receipt,
       notes: details.notes,
-    })
+    }
+    if (details.orderId && details.orderId > 0) {
+      payload.orderId = details.orderId
+    }
+    return api.post<PaymentOrderResponse>('/api/payment/create-order', payload)
   },
 
   /**
    * Verify payment signature after successful payment
    */
-  handlePaymentSuccess: async (paymentData: PaymentVerificationPayload) => {
-    return api.post('/api/payment/verify-payment', paymentData)
+  handlePaymentSuccess: async (paymentData: PaymentVerificationPayload): Promise<Record<string, unknown>> => {
+    return api.post<Record<string, unknown>>('/api/payment/verify-payment', paymentData)
   },
 
   /**

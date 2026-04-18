@@ -114,6 +114,7 @@ export default function Checkout() {
       } else {
         // For online payments, create Razorpay order
         const orderResponse = await paymentApi.createOrder({
+          orderId: 0, // Optional - will be set later when order is placed
           amount: total,
           currency: 'INR',
           receipt: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -129,7 +130,7 @@ export default function Checkout() {
         const razorpayKeyId = keyData.keyId
 
         initiateRazorpayPayment(
-          orderResponse.id,
+          orderResponse.razorpayId,
           razorpayKeyId,
           total,
           address.email,
@@ -138,9 +139,9 @@ export default function Checkout() {
             try {
               // Verify payment on backend
               await paymentApi.handlePaymentSuccess({
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
+                razorpayId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
               })
               dispatch(clearCart())
               setSuccess(true)
