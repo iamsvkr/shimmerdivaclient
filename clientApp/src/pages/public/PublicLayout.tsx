@@ -104,10 +104,9 @@ export default function PublicLayout() {
             <div className="footer-col">
               <h4>Connect</h4>
               <ul>
-                <li><a href="#">Instagram</a></li>
-                <li><a href="#">Pinterest</a></li>
-                <li><a href="#">WhatsApp</a></li>
-                <li><a href="#">Email Us</a></li>
+                <li><a href="https://www.instagram.com/theshimmerdiva" target='_blank'>Instagram</a></li>
+                <li><a href="https://wa.me/8397032820" target='_blank'>WhatsApp</a></li>
+                <li><a href="mailto:theshimmerdiva@gmail.com" target='_blank'>Email Us</a></li>
               </ul>
             </div>
           </div>

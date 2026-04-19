@@ -47,6 +47,7 @@ const formatExpiry = (val: string) => {
 export default function Checkout() {
   const dispatch = useAppDispatch()
   const items = useAppSelector((state) => state.cart.items)
+  const token = useAppSelector((state) => state.auth.token)
   const subtotal = useAppSelector(selectCartTotal)
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE
   const total = subtotal + shipping
@@ -118,10 +119,15 @@ export default function Checkout() {
         // 3. Create Razorpay order with orderId → razorpayId is saved to DB
         // 4. Verify payment → finds order by razorpayId
 
+        if (!token) {
+          throw new Error('User not authenticated. Please login to place an order.')
+        }
+
         const addressResponse = await fetch('/api/v1/addresses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': token || '',
           },
           body: JSON.stringify({
             line1: address.street,
@@ -144,6 +150,7 @@ export default function Checkout() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': token || '',
           },
           body: JSON.stringify({
             addressId: addressId,
