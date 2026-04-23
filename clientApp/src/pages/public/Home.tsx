@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { itemsApi } from '../../api/items'
 import { categoriesApi } from '../../api/categories'
 import type { Item } from '../../api/items'
 import type { Category } from '../../api/categories'
-import { useAppDispatch } from '../../app/hooks'
-import { addToCart } from '../../features/cart/cartSlice'
 import Toast from '../../components/Toast'
+import ProductCard from '../../components/ProductCard'
 
 const CATEGORY_ICONS: Record<string, string> = {
   rings: '💍',
@@ -49,8 +48,6 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState('')
-  const dispatch = useAppDispatch()
-  const navigate = useNavigate()
 
   useEffect(() => {
     Promise.allSettled([
@@ -62,21 +59,6 @@ export default function Home() {
       setLoading(false)
     })
   }, [])
-
-  const handleAddToCart = (item: Item, e: React.MouseEvent) => {
-    e.stopPropagation()
-    dispatch(
-      addToCart({
-        itemId: item.id,
-        name: item.name,
-        price: item.price,
-        discountPrice: item.discountPrice,
-        imageUrl: item.images?.[0]?.imageUrl,
-        quantity: 1,
-      }),
-    )
-    setToast(`${item.name} added to cart`)
-  }
 
   return (
     <>
@@ -175,64 +157,13 @@ export default function Home() {
           ) : (
             <>
               <div className="products-grid">
-                {featuredItems.map((item) => {
-                  const discount = item.discountPrice && item.price > item.discountPrice
-                    ? Math.round(((item.price - item.discountPrice) / item.price) * 100)
-                    : 0
-                  return (
-                    <div
-                      key={item.id}
-                      className="product-card"
-                      onClick={() => navigate(`/item/${item.id}`)}
-                    >
-                      <div className="product-image-wrap">
-                        {item.images?.[0] ? (
-                          <img src={item.images[0].imageUrl} alt={item.name} />
-                        ) : (
-                          <div className="product-placeholder">💎</div>
-                        )}
-                        {discount > 0 && (
-                          <span className="product-badge sale">{discount}% OFF</span>
-                        )}
-                        <button className="product-wishlist" onClick={(e) => e.stopPropagation()}>
-                          🤍
-                        </button>
-                      </div>
-                      <div className="product-info">
-                        {item.categoryName && (
-                          <div className="product-category">{item.categoryName}</div>
-                        )}
-                        <div className="product-name">{item.name}</div>
-                        {item.materialName && (
-                          <div className="product-material">{item.materialName}</div>
-                        )}
-                        {item.averageRating ? (
-                          <div className="product-rating">
-                            <span className="stars">{stars(Math.round(item.averageRating))}</span>
-                            <span className="rating-count">({item.reviewCount})</span>
-                          </div>
-                        ) : null}
-                        <div className="product-price">
-                          <span className="price-current">
-                            ₹{(item.discountPrice ?? item.price).toLocaleString()}
-                          </span>
-                          {discount > 0 && (
-                            <span className="price-original">₹{item.price.toLocaleString()}</span>
-                          )}
-                          {discount > 0 && (
-                            <span className="price-save">Save {discount}%</span>
-                          )}
-                        </div>
-                        <button
-                          className="product-add-btn"
-                          onClick={(e) => handleAddToCart(item, e)}
-                        >
-                          <span>🛍</span> Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })}
+                {featuredItems.map((item) => (
+                  <ProductCard
+                    key={item.id}
+                    item={item}
+                    onAddToCart={(message) => setToast(message)}
+                  />
+                ))}
               </div>
               <div style={{ textAlign: 'center', marginTop: 48 }}>
                 <Link to="/shop">

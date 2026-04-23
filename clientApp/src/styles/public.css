@@ -626,6 +626,70 @@ button { font-family: 'Inter', sans-serif; cursor: pointer; }
   transform: scale(1.08);
 }
 
+/* ── Slideshow Navigation ── */
+.slideshow-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--black);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition), background var(--transition), transform 0.2s;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.slideshow-nav:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.slideshow-nav-prev {
+  left: 10px;
+}
+
+.slideshow-nav-next {
+  right: 10px;
+}
+
+.product-card:hover .slideshow-nav {
+  opacity: 1;
+}
+
+.slideshow-indicators {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 3;
+}
+
+.indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.indicator.active {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.2);
+}
+
 .product-placeholder {
   width: 100%;
   height: 100%;
