@@ -111,17 +111,46 @@ export default function Checkout() {
 
     try {
       if (paymentMethod === 'cod') {
-        // For COD, skip Razorpay and directly complete order
-        await new Promise((r) => setTimeout(r, 1000))
+        // COD: find/create user, sync cart, save address, place order
+        let activeToken = token
+        if (!activeToken) {
+          const guestRes = await authApi.guestCheckout(address.email)
+          activeToken = guestRes.token
+          dispatch(setToken(activeToken))
+        }
+
+        for (const item of items) {
+          await api.post('/api/v1/cart/items', {
+            ...(item.variantId ? { itemVariantId: item.variantId } : { itemId: item.itemId }),
+            quantity: item.quantity,
+          })
+        }
+
+        const addressResponse = await api.post<{ id: number }>('/api/v1/addresses', {
+          line1: address.street,
+          line2: '',
+          city: address.city,
+          state: address.state,
+          pincode: address.zipCode,
+          country: address.country,
+          isDefault: true,
+        })
+
+        await api.post('/api/v1/orders', {
+          addressId: addressResponse.id,
+          promoCode: '',
+        })
+
         dispatch(clearCart())
         setSuccess(true)
       } else {
         // For online payments, follow this sequence:
         // 1. Ensure user exists (find or create guest account) → get token
-        // 2. Save address → get addressId
-        // 3. Place order → get orderId
-        // 4. Create Razorpay order with orderId → razorpayId is saved to DB
-        // 5. Verify payment → finds order by razorpayId
+        // 2. Sync local cart items to server
+        // 3. Save address → get addressId
+        // 4. Place order → get orderId
+        // 5. Create Razorpay order with orderId → razorpayId is saved to DB
+        // 6. Verify payment → finds order by razorpayId
 
         // Step 1: Find or create guest user if not logged in
         let activeToken = token
@@ -129,6 +158,18 @@ export default function Checkout() {
           const guestRes = await authApi.guestCheckout(address.email)
           activeToken = guestRes.token
           dispatch(setToken(activeToken))
+        }
+
+        console.log('***items', items);
+        // Step 2: Sync local cart items to the server
+        // The server's placeOrder reads from the server-side cart, so we must push
+        // all local cart items there before placing the order.
+        // If variantId is missing we fall back to itemId so the server picks the first variant.
+        for (const item of items) {
+          await api.post('/api/v1/cart/items', {
+            ...(item.variantId ? { itemVariantId: item.variantId } : { itemId: item.itemId }),
+            quantity: item.quantity,
+          })
         }
 
         const addressResponse = await api.post<{ id: number }>('/api/v1/addresses', {
@@ -143,7 +184,7 @@ export default function Checkout() {
 
         const addressId = addressResponse.id
 
-        // Step 2: Place order
+        // Step 4: Place order
         const orderResponse = await api.post<{ id: number }>('/api/v1/orders', {
           addressId: addressId,
           promoCode: '', // Add if available
@@ -151,7 +192,7 @@ export default function Checkout() {
 
         const dbOrderId = orderResponse.id
 
-        // Step 3: Create Razorpay order with DB orderId
+        // Step 5: Create Razorpay order with DB orderId
         const razorpayOrderResponse = await paymentApi.createOrder({
           orderId: dbOrderId,
           amount: total,
