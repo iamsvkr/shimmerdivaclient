@@ -12,4 +12,6 @@ export interface AuthResponse {
 
 export const authApi = {
   login: (data: LoginRequest) => api.post<AuthResponse>('/login', data),
+  guestCheckout: (email: string) =>
+    api.post<AuthResponse>('/api/v1/auth/guest-checkout', { email }),
 }

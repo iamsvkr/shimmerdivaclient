@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { clearCart, selectCartTotal } from '../../features/cart/cartSlice'
+import { setToken } from '../../features/auth/authSlice'
 import { paymentApi, initiateRazorpayPayment } from '../../api/payment'
 import { api } from '../../api/client'
+import { authApi } from '../../api/auth'
 
 const SHIPPING_THRESHOLD = 999
 const SHIPPING_FEE = 99
@@ -115,13 +117,18 @@ export default function Checkout() {
         setSuccess(true)
       } else {
         // For online payments, follow this sequence:
-        // 1. Save address → get addressId
-        // 2. Place order → get orderId
-        // 3. Create Razorpay order with orderId → razorpayId is saved to DB
-        // 4. Verify payment → finds order by razorpayId
+        // 1. Ensure user exists (find or create guest account) → get token
+        // 2. Save address → get addressId
+        // 3. Place order → get orderId
+        // 4. Create Razorpay order with orderId → razorpayId is saved to DB
+        // 5. Verify payment → finds order by razorpayId
 
-        if (!token) {
-          throw new Error('User not authenticated. Please login to place an order.')
+        // Step 1: Find or create guest user if not logged in
+        let activeToken = token
+        if (!activeToken) {
+          const guestRes = await authApi.guestCheckout(address.email)
+          activeToken = guestRes.token
+          dispatch(setToken(activeToken))
         }
 
         const addressResponse = await api.post<{ id: number }>('/api/v1/addresses', {
