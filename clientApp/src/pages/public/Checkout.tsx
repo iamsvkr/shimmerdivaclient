@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { clearCart, selectCartTotal } from '../../features/cart/cartSlice'
 import { paymentApi, initiateRazorpayPayment } from '../../api/payment'
+import { api } from '../../api/client'
 
 const SHIPPING_THRESHOLD = 999
 const SHIPPING_FEE = 99
@@ -123,42 +124,22 @@ export default function Checkout() {
           throw new Error('User not authenticated. Please login to place an order.')
         }
 
-        const addressResponse = await fetch('/api/v1/addresses', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token || '',
-          },
-          body: JSON.stringify({
-            line1: address.street,
-            line2: '',
-            city: address.city,
-            state: address.state,
-            pincode: address.zipCode,
-            country: address.country,
-            isDefault: true,
-          }),
-        }).then((res) => {
-          if (!res.ok) throw new Error('Failed to save address')
-          return res.json()
+        const addressResponse = await api.post<{ id: number }>('/api/v1/addresses', {
+          line1: address.street,
+          line2: '',
+          city: address.city,
+          state: address.state,
+          pincode: address.zipCode,
+          country: address.country,
+          isDefault: true,
         })
 
         const addressId = addressResponse.id
 
         // Step 2: Place order
-        const orderResponse = await fetch('/api/v1/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token || '',
-          },
-          body: JSON.stringify({
-            addressId: addressId,
-            promoCode: '', // Add if available
-          }),
-        }).then((res) => {
-          if (!res.ok) throw new Error('Failed to place order')
-          return res.json()
+        const orderResponse = await api.post<{ id: number }>('/api/v1/orders', {
+          addressId: addressId,
+          promoCode: '', // Add if available
         })
 
         const dbOrderId = orderResponse.id
