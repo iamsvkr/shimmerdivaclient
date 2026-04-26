@@ -58,6 +58,7 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card')
   const [placing, setPlacing] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [completedTotal, setCompletedTotal] = useState(0)
   const [orderId] = useState(() => Math.floor(100000 + Math.random() * 900000))
   const [paymentError, setPaymentError] = useState('')
 
@@ -141,6 +142,7 @@ export default function Checkout() {
           promoCode: '',
         })
 
+        setCompletedTotal(total)
         dispatch(clearCart())
         setSuccess(true)
       } else {
@@ -224,6 +226,7 @@ export default function Checkout() {
                 razorpayPaymentId: response.razorpay_payment_id,
                 razorpaySignature: response.razorpay_signature,
               })
+              setCompletedTotal(total)
               dispatch(clearCart())
               setSuccess(true)
             } catch (error) {
@@ -292,7 +295,7 @@ export default function Checkout() {
               paymentMethod === 'upi' ? 'UPI' :
               paymentMethod === 'netbanking' ? 'Net Banking' : 'Cash on Delivery'
             }</div>
-            <div><strong>Amount Paid:</strong> ₹{total.toLocaleString()}</div>
+            <div><strong>Amount Paid:</strong> ₹{completedTotal.toLocaleString()}</div>
             <div style={{ marginTop: 8, color: '#2e7d32', fontWeight: 500 }}>
               ✓ Confirmation sent to {address.email}
             </div>

@@ -55,7 +55,7 @@ export default function ProductCard({ item, onAddToCart }: ProductCardProps) {
   return (
     <div
       className="product-card"
-      onClick={() => navigate(`/item/${item.id}`)}
+      onClick={() => navigate(`/item/${item.id}`, { state: { item } })}
     >
       <div className="product-image-wrap">
         {hasImages ? (

@@ -267,7 +267,7 @@ export default function Shop() {
                       <div
                         key={item.id}
                         className="product-card"
-                        onClick={() => navigate(`/item/${item.id}`)}
+                        onClick={() => navigate(`/item/${item.id}`, { state: { item } })}
                       >
                         <div className="product-image-wrap">
                           {item.images?.[0] ? (
