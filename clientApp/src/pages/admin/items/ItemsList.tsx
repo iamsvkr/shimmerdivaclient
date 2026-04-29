@@ -102,8 +102,8 @@ export default function ItemsList() {
                         <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{item.tags}</div>
                       )}
                     </td>
-                    <td>{item.categoryName ?? '—'}</td>
-                    <td>{item.materialName ?? '—'}</td>
+                    <td>{item.category ?? '—'}</td>
+                    <td>{item.material ?? '—'}</td>
                     <td>₹{item.price?.toLocaleString()}</td>
                     <td>{item.discountPrice ? `₹${item.discountPrice.toLocaleString()}` : '—'}</td>
                     <td>

@@ -36,6 +36,11 @@ export default function ItemForm({ item, onSave, onCancel }: Props) {
       .then(([cats, mats]) => {
         setCategories(cats ?? [])
         setMaterials(mats ?? [])
+        setForm((f) => ({
+          ...f,
+          categoryId: f.categoryId || cats?.find((c) => c.name === item?.category)?.id,
+          materialId: f.materialId || mats?.find((m) => m.name === item?.material)?.id,
+        }))
       })
       .catch(() => {})
   }, [])
@@ -73,6 +78,8 @@ export default function ItemForm({ item, onSave, onCancel }: Props) {
       setSaving(false)
     }
   }
+
+  console.log('Form state:', form, item)
 
   return (
     <div className="modal-backdrop">

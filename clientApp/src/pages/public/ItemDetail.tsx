@@ -112,9 +112,9 @@ export default function ItemDetail() {
           <span>›</span>
           <Link to="/shop">Shop</Link>
           <span>›</span>
-          {item.categoryName && (
+          {item.category && (
             <>
-              <Link to={`/shop?categoryId=${item.categoryId}`}>{item.categoryName}</Link>
+              <Link to={`/shop?categoryId=${item.categoryId}`}>{item.category}</Link>
               <span>›</span>
             </>
           )}
@@ -149,11 +149,11 @@ export default function ItemDetail() {
           {/* ── Info ── */}
           <div className="detail-info">
             <div className="detail-badge-row">
-              {item.categoryName && (
-                <span className="detail-badge category">{item.categoryName}</span>
+              {item.category && (
+                <span className="detail-badge category">{item.category}</span>
               )}
-              {item.materialName && (
-                <span className="detail-badge material">{item.materialName}</span>
+              {item.material && (
+                <span className="detail-badge material">{item.material}</span>
               )}
             </div>
 
@@ -256,7 +256,7 @@ export default function ItemDetail() {
               gap: 8,
             }}>
               {[
-                { icon: '🚚', text: 'Free delivery on orders above ₹999' },
+                { icon: '🚚', text: 'Free delivery on orders above ₹500' },
                 { icon: '💎', text: 'Certified authentic jewellery' },
                 { icon: '🔄', text: '15-day hassle-free returns' },
                 { icon: '🔒', text: '100% secure checkout' },

@@ -287,12 +287,12 @@ export default function Shop() {
                           </button>
                         </div>
                         <div className="product-info">
-                          {item.categoryName && (
-                            <div className="product-category">{item.categoryName}</div>
+                          {item.category && (
+                            <div className="product-category">{item.category}</div>
                           )}
                           <div className="product-name">{item.name}</div>
-                          {item.materialName && (
-                            <div className="product-material">{item.materialName}</div>
+                          {item.material && (
+                            <div className="product-material">{item.material}</div>
                           )}
                           {item.averageRating ? (
                             <div className="product-rating">

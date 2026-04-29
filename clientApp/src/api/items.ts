@@ -19,9 +19,9 @@ export interface Item {
   price: number
   discountPrice?: number
   categoryId?: number
-  categoryName?: string
+  category?: string
   materialId?: number
-  materialName?: string
+  material?: string
   tags?: string
   active: boolean
   images?: ItemImage[]
