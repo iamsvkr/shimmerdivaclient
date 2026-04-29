@@ -36,9 +36,9 @@ const CATEGORY_GRADIENTS = [
 ]
 
 const TESTIMONIALS = [
-  { name: 'Priya S.', loc: 'Mumbai', text: 'Absolutely stunning! The gold nose ring I ordered is exactly as pictured — delicate, beautifully crafted, and arrived in gorgeous packaging.', stars: 5 },
-  { name: 'Ananya K.', loc: 'Bangalore', text: 'Shimmer Diva never disappoints. The quality is exceptional and the pieces always get compliments. My go-to for all jewellery gifts.', stars: 5 },
-  { name: 'Meera R.', loc: 'Delhi', text: 'Ordered the bridal set and it was just perfect. The craftsmanship is superb and customer service was amazing. Will definitely order again!', stars: 5 },
+  { name: 'Priya S.', loc: 'Mumbai', text: 'Absolutely stunning! The kashmiri earrings I ordered is exactly as pictured — delicate, beautifully crafted, and arrived in gorgeous packaging.', stars: 5 },
+  { name: 'Ananya K.', loc: 'Bangalore', text: 'Shimmer Diva never disappoints. The quality is exceptional and the pieces always get compliments. My go-to for all jewellery gifts.', stars: 4.5 },
+  { name: 'Meera R.', loc: 'Delhi', text: 'Ordered the western earrings and pendants and it was just perfect. The craftsmanship is superb and customer service was amazing. Will definitely order again!', stars: 5 },
 ]
 
 const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n)
@@ -58,7 +58,7 @@ export default function Home() {
       if (cats.status === 'fulfilled') setCategories(cats.value ?? [])
       setLoading(false)
     })
-  }, [])
+  }, []);
 
   return (
     <>
@@ -68,22 +68,22 @@ export default function Home() {
         <div className="hero-pattern" />
         <div className="container">
           <div className="hero-content">
-            <div className="hero-badge">New Collection 2025</div>
+            <div className="hero-badge">
+              New Collection {new Date().getFullYear()}
+            </div>
             <h1>
               Where Every Piece
               <br />
               Tells a <span className="highlight">Story</span>
             </h1>
             <p>
-              Discover our handcrafted jewellery collection — from timeless gold classics
-              to contemporary silver designs. Made for the woman who knows her worth.
+              Discover our unique jewellery collection — from timeless western
+              classics to contemporary traditional designs. Made for the woman who
+              knows her worth.
             </p>
             <div className="hero-actions">
               <Link to="/shop">
                 <button className="btn-gold">Shop Collection →</button>
-              </Link>
-              <Link to="/shop?material=gold">
-                <button className="btn-outline">Explore Gold</button>
               </Link>
             </div>
           </div>
@@ -96,11 +96,22 @@ export default function Home() {
         <div className="container">
           <div className="features-grid">
             {[
-              { icon: '🚚', title: 'Free Delivery', desc: 'On all orders above ₹999' },
-              { icon: '💎', title: 'Certified Quality', desc: 'Hallmarked & certified jewellery' },
-              { icon: '🔄', title: 'Easy Returns', desc: '15-day hassle-free returns' },
-              { icon: '🔒', title: 'Secure Payment', desc: 'Your transactions are safe' },
-            ].map((f) => (
+              {
+                icon: "🚚",
+                title: "Free Delivery",
+                desc: "On all orders above ₹500",
+              },
+              {
+                icon: "💎",
+                title: "Certified Quality",
+                desc: "Certified jewellery",
+              },
+              {
+                icon: "🔒",
+                title: "Secure Payment",
+                desc: "Your transactions are safe",
+              },
+            ].map(f => (
               <div key={f.title} className="feature-item">
                 <span className="feature-icon">{f.icon}</span>
                 <div className="feature-title">{f.title}</div>
@@ -118,19 +129,31 @@ export default function Home() {
             <div className="section-header">
               <span className="section-label">Browse by Style</span>
               <h2 className="section-title">Shop by Category</h2>
-              <div className="divider"><span>✦</span></div>
+              <div className="divider">
+                <span>✦</span>
+              </div>
             </div>
-            <div className="category-grid" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(150px, 1fr))` }}>
+            <div
+              className="category-grid"
+              style={{
+                gridTemplateColumns: `repeat(auto-fill, minmax(150px, 1fr))`,
+              }}
+            >
               {categories.slice(0, 6).map((cat, idx) => (
                 <Link
                   key={cat.id}
                   to={`/shop?categoryId=${cat.id}`}
                   className="category-card"
-                  style={{ background: CATEGORY_GRADIENTS[idx % CATEGORY_GRADIENTS.length] }}
+                  style={{
+                    background:
+                      CATEGORY_GRADIENTS[idx % CATEGORY_GRADIENTS.length],
+                  }}
                 >
                   <div className="category-card-bg" />
                   <div className="category-card-content">
-                    <span className="category-icon">{getCategoryIcon(cat.name)}</span>
+                    <span className="category-icon">
+                      {getCategoryIcon(cat.name)}
+                    </span>
                     <div className="category-name">{cat.name}</div>
                   </div>
                 </Link>
@@ -141,31 +164,39 @@ export default function Home() {
       )}
 
       {/* ── FEATURED ITEMS ── */}
-      <section className="section" style={{ background: '#fff', paddingTop: 80 }}>
+      <section
+        className="section"
+        style={{ background: "#fff", paddingTop: 80 }}
+      >
         <div className="container">
           <div className="section-header">
             <span className="section-label">Handpicked for You</span>
             <h2 className="section-title">New Arrivals</h2>
-            <div className="divider"><span>✦</span></div>
+            <div className="divider">
+              <span>✦</span>
+            </div>
             <p className="section-sub">
-              Each piece is crafted with love using the finest metals and stones.
+              Each piece is crafted with love using the finest metals and
+              stones.
             </p>
           </div>
 
           {loading ? (
-            <div className="page-loading"><div className="spinner" /></div>
+            <div className="page-loading">
+              <div className="spinner" />
+            </div>
           ) : (
             <>
               <div className="products-grid">
-                {featuredItems.map((item) => (
+                {featuredItems.map(item => (
                   <ProductCard
                     key={item.id}
                     item={item}
-                    onAddToCart={(message) => setToast(message)}
+                    onAddToCart={message => setToast(message)}
                   />
                 ))}
               </div>
-              <div style={{ textAlign: 'center', marginTop: 48 }}>
+              <div style={{ textAlign: "center", marginTop: 48 }}>
                 <Link to="/shop">
                   <button className="btn-dark">View All Jewellery →</button>
                 </Link>
@@ -176,20 +207,49 @@ export default function Home() {
       </section>
 
       {/* ── BANNER ── */}
-      <section style={{
-        background: 'linear-gradient(135deg, #1a0a00 0%, #3d1f00 50%, #1a0a00 100%)',
-        padding: '80px 0',
-        textAlign: 'center',
-      }}>
+      <section
+        style={{
+          background:
+            "linear-gradient(135deg, #1a0a00 0%, #3d1f00 50%, #1a0a00 100%)",
+          padding: "80px 0",
+          textAlign: "center",
+        }}
+      >
         <div className="container">
-          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--gold)', display: 'block', marginBottom: 12 }}>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              color: "var(--gold)",
+              display: "block",
+              marginBottom: 12,
+            }}
+          >
             Limited Time
           </span>
-          <h2 style={{ fontFamily: '"Playfair Display", serif', fontSize: 'clamp(28px, 4vw, 48px)', color: '#fff', marginBottom: 16 }}>
+          <h2
+            style={{
+              fontFamily: '"Playfair Display", serif',
+              fontSize: "clamp(28px, 4vw, 48px)",
+              color: "#fff",
+              marginBottom: 16,
+            }}
+          >
             The Bridal Collection is Here
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 16, marginBottom: 32, maxWidth: 460, margin: '0 auto 32px' }}>
-            Exquisite sets crafted for your most special day. Gold, diamond & more.
+          <p
+            style={{
+              color: "rgba(255,255,255,0.6)",
+              fontSize: 16,
+              marginBottom: 32,
+              maxWidth: 460,
+              margin: "0 auto 32px",
+            }}
+          >
+            Exquisite sets crafted for your most special day. Gold, diamond &
+            more.
           </p>
           <Link to="/shop">
             <button className="btn-gold">Explore Bridal →</button>
@@ -203,10 +263,12 @@ export default function Home() {
           <div className="section-header">
             <span className="section-label">Customer Love</span>
             <h2 className="section-title">What Our Customers Say</h2>
-            <div className="divider"><span>✦</span></div>
+            <div className="divider">
+              <span>✦</span>
+            </div>
           </div>
           <div className="testimonials-grid">
-            {TESTIMONIALS.map((t) => (
+            {TESTIMONIALS.map(t => (
               <div key={t.name} className="testimonial-card">
                 <p className="testimonial-text">{t.text}</p>
                 <div className="testimonial-author">
@@ -214,8 +276,11 @@ export default function Home() {
                   <div>
                     <div className="testimonial-name">{t.name}</div>
                     <div className="testimonial-loc">
-                      <span className="stars" style={{ fontSize: 11 }}>{stars(t.stars)}</span>
-                      {' · '}{t.loc}
+                      <span className="stars" style={{ fontSize: 11 }}>
+                        {stars(t.stars)}
+                      </span>
+                      {" · "}
+                      {t.loc}
                     </div>
                   </div>
                 </div>
@@ -225,7 +290,7 @@ export default function Home() {
         </div>
       </section>
 
-      {toast && <Toast message={toast} onClose={() => setToast('')} />}
+      {toast && <Toast message={toast} onClose={() => setToast("")} />}
     </>
   )
 }
