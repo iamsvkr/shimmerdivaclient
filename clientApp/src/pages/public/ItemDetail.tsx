@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
-import { itemsApi } from '../../api/items'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import type { Item, ItemVariant } from '../../api/items'
-import { reviewsApi } from '../../api/reviews'
 import type { Review } from '../../api/reviews'
 import { useAppDispatch } from '../../app/hooks'
 import { addToCart } from '../../features/cart/cartSlice'
@@ -13,32 +11,30 @@ const stars = (n: number) => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math
 export default function ItemDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const dispatch = useAppDispatch()
 
-  const [item, setItem] = useState<Item | null>(null)
+  const locationItem = (location.state as { item?: Item } | null)?.item ?? null
+  const [item, setItem] = useState<Item | null>(locationItem)
   const [reviews, setReviews] = useState<Review[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!locationItem)
   const [activeImg, setActiveImg] = useState(0)
-  const [selectedVariant, setSelectedVariant] = useState<ItemVariant | null>(null)
+  const [selectedVariant, setSelectedVariant] = useState<ItemVariant | null>(
+    locationItem?.variants?.[0] ?? null,
+  )
   const [qty, setQty] = useState(1)
   const [toast, setToast] = useState('')
   const [added, setAdded] = useState(false)
 
   useEffect(() => {
     if (!id) return
-    setLoading(true)
-    Promise.allSettled([
-      itemsApi.getPublicAll({ size: 1 }),
-      reviewsApi.getPending(),
-    ])
-    // Fetch item directly by id via search
     fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/v1/items/${id}`)
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error(); return r.json() })
       .then((data: Item) => {
         setItem(data)
         if (data.variants?.length) setSelectedVariant(data.variants[0])
       })
-      .catch(() => setItem(null))
+      .catch(() => { if (!locationItem) setItem(null) })
       .finally(() => setLoading(false))
 
     fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/v1/items/${id}/reviews`)

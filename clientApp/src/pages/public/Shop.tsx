@@ -113,7 +113,7 @@ export default function Shop() {
       <div className="shop-header">
         <div className="container">
           <h1>Our Collection</h1>
-          <p>{total > 0 ? `${total} handcrafted pieces` : 'Discover timeless beauty'}</p>
+          <p>{total > 0 ? `${total} unique pieces` : 'Discover timeless beauty'}</p>
         </div>
       </div>
 
@@ -267,7 +267,7 @@ export default function Shop() {
                       <div
                         key={item.id}
                         className="product-card"
-                        onClick={() => navigate(`/item/${item.id}`)}
+                        onClick={() => navigate(`/item/${item.id}`, { state: { item } })}
                       >
                         <div className="product-image-wrap">
                           {item.images?.[0] ? (
