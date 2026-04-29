@@ -113,7 +113,7 @@ export default function Shop() {
       <div className="shop-header">
         <div className="container">
           <h1>Our Collection</h1>
-          <p>{total > 0 ? `${total} handcrafted pieces` : 'Discover timeless beauty'}</p>
+          <p>{total > 0 ? `${total} unique pieces` : 'Discover timeless beauty'}</p>
         </div>
       </div>
 
