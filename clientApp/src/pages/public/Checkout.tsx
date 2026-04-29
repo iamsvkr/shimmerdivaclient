@@ -6,9 +6,7 @@ import { setToken } from '../../features/auth/authSlice'
 import { paymentApi, initiateRazorpayPayment } from '../../api/payment'
 import { api } from '../../api/client'
 import { authApi } from '../../api/auth'
-
-const SHIPPING_THRESHOLD = 999
-const SHIPPING_FEE = 99
+import { SHIPPING_FEE, SHIPPING_THRESHOLD } from '../../utils/Constants'
 
 type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'cod'
 

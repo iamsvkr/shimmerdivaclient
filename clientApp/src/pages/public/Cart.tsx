@@ -7,9 +7,7 @@ import {
   selectCartTotal,
 } from '../../features/cart/cartSlice'
 import type { CartItem } from '../../features/cart/cartSlice'
-
-const SHIPPING_THRESHOLD = 999
-const SHIPPING_FEE = 99
+import { SHIPPING_FEE, SHIPPING_THRESHOLD } from '../../utils/Constants'
 
 export default function Cart() {
   const dispatch = useAppDispatch()
