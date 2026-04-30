@@ -132,6 +132,7 @@ export default function Checkout() {
           state: address.state,
           pincode: address.zipCode,
           country: address.country,
+          phone: address.phone,
           isDefault: true,
         })
 
@@ -179,6 +180,7 @@ export default function Checkout() {
           state: address.state,
           pincode: address.zipCode,
           country: address.country,
+          phone: address.phone,
           isDefault: true,
         })
 
