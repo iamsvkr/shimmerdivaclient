@@ -41,6 +41,7 @@ export default function OrdersList() {
   const [editOrder, setEditOrder] = useState<Order | null>(null)
   const [newOrderStatus, setNewOrderStatus] = useState<OrderStatus>('PENDING')
   const [newPaymentStatus, setNewPaymentStatus] = useState<PaymentStatus | ''>('')
+  const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -123,39 +124,94 @@ export default function OrdersList() {
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order.id}>
-                    <td>#{order.id}</td>
-                    <td>
-                      <div>{order.shippingAddress.line1}</div>
-                      <div style={{ fontSize: 12, color: '#666' }}>
-                        {order.shippingAddress.city}, {order.shippingAddress.state}
-                      </div>
-                    </td>
-                    <td>
-                      ₹{order.finalAmount?.toLocaleString()}
-                      {order.discountAmount > 0 && (
-                        <div style={{ fontSize: 11, color: '#2e7d32' }}>
-                          -{order.discountAmount?.toLocaleString()} off
+                  <>
+                    <tr key={order.id}>
+                      <td>
+                        <button
+                          className="btn btn-link"
+                          onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+                          style={{ padding: 0, marginRight: 8 }}
+                        >
+                          {expandedOrderId === order.id ? '▼' : '▶'}
+                        </button>
+                        #{order.id}
+                      </td>
+                      <td>
+                        <div>{order.shippingAddress.line1}</div>
+                        <div style={{ fontSize: 12, color: '#666' }}>
+                          {order.shippingAddress.city}, {order.shippingAddress.state}
                         </div>
-                      )}
-                    </td>
-                    <td>
-                      <span className={`badge ${statusBadge(order.status)}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`badge ${paymentBadge(order.paymentStatus)}`}>
-                        {order.paymentStatus}
-                      </span>
-                    </td>
-                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td>
-                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(order)}>
-                        Update Status
-                      </button>
-                    </td>
-                  </tr>
+                        {order.shippingAddress.phone && (
+                          <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
+                            📞 {order.shippingAddress.phone}
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        ₹{order.finalAmount?.toLocaleString()}
+                        {order.discountAmount > 0 && (
+                          <div style={{ fontSize: 11, color: '#2e7d32' }}>
+                            -{order.discountAmount?.toLocaleString()} off
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <span className={`badge ${statusBadge(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`badge ${paymentBadge(order.paymentStatus)}`}>
+                          {order.paymentStatus}
+                        </span>
+                      </td>
+                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td>
+                        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(order)}>
+                          Update Status
+                        </button>
+                      </td>
+                    </tr>
+                    {expandedOrderId === order.id && (
+                      <tr key={`${order.id}-expanded`} style={{ backgroundColor: '#f9f9f9' }}>
+                        <td colSpan={7} style={{ padding: '12px 16px' }}>
+                          <div style={{ marginBottom: 8 }}>
+                            <strong>Items Ordered ({order.items.length})</strong>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {order.items.map((item) => (
+                              <div
+                                key={item.orderItemId}
+                                style={{
+                                  padding: 10,
+                                  backgroundColor: '#fff',
+                                  borderRadius: 4,
+                                  border: '1px solid #eee',
+                                  fontSize: 13,
+                                }}
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                  <div>
+                                    <strong>{item.itemName}</strong>
+                                    <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>
+                                      {item.variantLabel} • SKU: {item.sku}
+                                    </div>
+                                  </div>
+                                  <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontWeight: 500 }}>₹{item.priceAtPurchase}</div>
+                                    <div style={{ fontSize: 11, color: '#666' }}>Qty: {item.quantity}</div>
+                                  </div>
+                                </div>
+                                <div style={{ textAlign: 'right', fontSize: 12, color: '#2e7d32', fontWeight: 500 }}>
+                                  Subtotal: ₹{item.subtotal?.toLocaleString()}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
                 ))}
               </tbody>
             </table>
