@@ -6,7 +6,7 @@ const ORDER_STATUSES: OrderStatus[] = [
   'PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED',
 ]
 
-const PAYMENT_STATUSES: PaymentStatus[] = ['PENDING', 'COMPLETED', 'FAILED', 'REFUNDED']
+const PAYMENT_STATUSES: PaymentStatus[] = ['PENDING', 'PAID', 'COMPLETED', 'FAILED', 'REFUNDED']
 
 const statusBadge = (s: OrderStatus) => {
   const map: Record<OrderStatus, string> = {
@@ -23,6 +23,7 @@ const statusBadge = (s: OrderStatus) => {
 const paymentBadge = (s: PaymentStatus) => {
   const map: Record<PaymentStatus, string> = {
     PENDING: 'badge-orange',
+    PAID: 'badge-green',
     COMPLETED: 'badge-green',
     FAILED: 'badge-red',
     REFUNDED: 'badge-gray',
@@ -46,8 +47,9 @@ export default function OrdersList() {
     setError('')
     try {
       const res = await ordersApi.getAll(filterStatus || undefined)
-      setOrders(res?.content ?? [])
-      setTotal(res?.totalElements ?? 0)
+      const orders = Array.isArray(res) ? res : []
+      setOrders(orders)
+      setTotal(orders.length)
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -59,7 +61,7 @@ export default function OrdersList() {
 
   const openEdit = (order: Order) => {
     setEditOrder(order)
-    setNewOrderStatus(order.orderStatus)
+    setNewOrderStatus(order.status)
     setNewPaymentStatus(order.paymentStatus)
   }
 
@@ -123,18 +125,23 @@ export default function OrdersList() {
                 {orders.map((order) => (
                   <tr key={order.id}>
                     <td>#{order.id}</td>
-                    <td>{order.userEmail ?? '—'}</td>
+                    <td>
+                      <div>{order.shippingAddress.line1}</div>
+                      <div style={{ fontSize: 12, color: '#666' }}>
+                        {order.shippingAddress.city}, {order.shippingAddress.state}
+                      </div>
+                    </td>
                     <td>
                       ₹{order.finalAmount?.toLocaleString()}
-                      {order.discount > 0 && (
+                      {order.discountAmount > 0 && (
                         <div style={{ fontSize: 11, color: '#2e7d32' }}>
-                          -{order.discount?.toLocaleString()} off
+                          -{order.discountAmount?.toLocaleString()} off
                         </div>
                       )}
                     </td>
                     <td>
-                      <span className={`badge ${statusBadge(order.orderStatus)}`}>
-                        {order.orderStatus}
+                      <span className={`badge ${statusBadge(order.status)}`}>
+                        {order.status}
                       </span>
                     </td>
                     <td>
@@ -160,6 +167,14 @@ export default function OrdersList() {
         <div className="modal-backdrop">
           <div className="modal">
             <h2 className="modal-title">Update Order #{editOrder.id}</h2>
+            <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #eee' }}>
+              <p style={{ margin: 0, fontSize: 12, color: '#666' }}>
+                <strong>Shipping to:</strong> {editOrder.shippingAddress.line1}, {editOrder.shippingAddress.city}, {editOrder.shippingAddress.state} {editOrder.shippingAddress.pincode}
+              </p>
+              <p style={{ margin: '8px 0 0 0', fontSize: 12, color: '#666' }}>
+                <strong>Items:</strong> {editOrder.items.length} item{editOrder.items.length !== 1 ? 's' : ''}
+              </p>
+            </div>
             <div className="form-group" style={{ marginBottom: 14 }}>
               <label>Order Status</label>
               <select
