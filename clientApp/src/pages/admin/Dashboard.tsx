@@ -26,7 +26,7 @@ export default function Dashboard() {
           totalItems:
             items.status === 'fulfilled' ? items.value?.totalElements ?? 0 : 0,
           pendingOrders:
-            orders.status === 'fulfilled' ? orders.value?.totalElements ?? 0 : 0,
+            orders.status === 'fulfilled' ? (orders.value?.length ?? 0) : 0,
           pendingReviews:
             reviews.status === 'fulfilled' ? (reviews.value?.length ?? 0) : 0,
           lowStockItems:
