@@ -1,23 +1,18 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { itemsApi } from '../../api/items'
 import { categoriesApi } from '../../api/categories'
 import { materialsApi } from '../../api/materials'
 import type { Item } from '../../api/items'
 import type { Category } from '../../api/categories'
 import type { Material } from '../../api/materials'
-import { useAppDispatch } from '../../app/hooks'
-import { addToCart } from '../../features/cart/cartSlice'
 import Toast from '../../components/Toast'
+import ProductCard from '../../components/ProductCard'
 
 const PAGE_SIZE = 12
 
-const stars = (n: number) => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n))
-
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
 
   const [items, setItems] = useState<Item[]>([])
   const [total, setTotal] = useState(0)
@@ -91,19 +86,6 @@ export default function Shop() {
     setPage(p)
     load(p)
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const handleAddToCart = (item: Item, e: React.MouseEvent) => {
-    e.stopPropagation()
-    dispatch(addToCart({
-      itemId: item.id,
-      name: item.name,
-      price: item.price,
-      discountPrice: item.discountPrice,
-      imageUrl: item.images?.[0]?.imageUrl,
-      quantity: 1,
-    }))
-    setToast(`${item.name} added to cart`)
   }
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
@@ -260,66 +242,12 @@ export default function Shop() {
               <>
                 <div className="products-grid">
                   {items.map((item) => {
-                    const discount = item.discountPrice && item.price > item.discountPrice
-                      ? Math.round(((item.price - item.discountPrice) / item.price) * 100)
-                      : 0
-                    return (
-                      <div
-                        key={item.id}
-                        className="product-card"
-                        onClick={() => navigate(`/item/${item.id}`, { state: { item } })}
-                      >
-                        <div className="product-image-wrap">
-                          {item.images?.[0] ? (
-                            <img src={item.images[0].imageUrl} alt={item.name} />
-                          ) : (
-                            <div className="product-placeholder">💎</div>
-                          )}
-                          {discount > 0 && (
-                            <span className="product-badge sale">{discount}% OFF</span>
-                          )}
-                          <button
-                            className="product-wishlist"
-                            onClick={(e) => e.stopPropagation()}
-                            title="Add to wishlist"
-                          >
-                            🤍
-                          </button>
-                        </div>
-                        <div className="product-info">
-                          {item.category && (
-                            <div className="product-category">{item.category}</div>
-                          )}
-                          <div className="product-name">{item.name}</div>
-                          {item.material && item.material !== 'NA' && (
-                            <div className="product-material">{item.material}</div>
-                          )}
-                          {item.averageRating ? (
-                            <div className="product-rating">
-                              <span className="stars">{stars(item.averageRating)}</span>
-                              <span className="rating-count">({item.reviewCount})</span>
-                            </div>
-                          ) : null}
-                          <div className="product-price">
-                            <span className="price-current">
-                              ₹{(item.discountPrice ?? item.price).toLocaleString()}
-                            </span>
-                            {discount > 0 && (
-                              <span className="price-original">₹{item.price.toLocaleString()}</span>
-                            )}
-                            {discount > 0 && (
-                              <span className="price-save">Save {discount}%</span>
-                            )}
-                          </div>
-                          <button
-                            className="product-add-btn"
-                            onClick={(e) => handleAddToCart(item, e)}
-                          >
-                            <span>🛍</span> Add to Cart
-                          </button>
-                        </div>
-                      </div>
-                    )
+                    return <ProductCard
+                      key={item.id}
+                      item={item}
+                      categories={categories}
+                      onAddToCart={message => setToast(message)}
+                    />
                   })}
                 </div>
 
