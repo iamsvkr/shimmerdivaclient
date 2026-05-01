@@ -5,12 +5,14 @@ export interface Category {
   name: string
   description?: string
   active: boolean
+  imageUrl?: string
 }
 
 export interface CategoryRequest {
   name: string
   description?: string
   isActive?: boolean
+  imageUrl?: string
 }
 
 export const categoriesApi = {

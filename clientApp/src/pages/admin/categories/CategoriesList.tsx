@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { categoriesApi } from '../../../api/categories'
 import type { Category, CategoryRequest } from '../../../api/categories'
 
-const emptyForm = (): CategoryRequest => ({ name: '', description: '', isActive: true })
+const emptyForm = (): CategoryRequest => ({ name: '', description: '', imageUrl: '', isActive: true })
 
 export default function CategoriesList() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -35,7 +35,7 @@ export default function CategoriesList() {
 
   const openEdit = (cat: Category) => {
     setEditing(cat)
-    setForm({ name: cat.name, description: cat.description ?? '', isActive: cat.active })
+    setForm({ name: cat.name, description: cat.description ?? '', imageUrl: cat.imageUrl ?? '', isActive: cat.active })
     setShowForm(true)
   }
 
@@ -80,6 +80,7 @@ export default function CategoriesList() {
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Image</th>
                   <th>Description</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -89,6 +90,17 @@ export default function CategoriesList() {
                 {categories.map((cat) => (
                   <tr key={cat.id}>
                     <td><strong>{cat.name}</strong></td>
+                    <td>
+                      {cat.imageUrl ? (
+                        <img 
+                          src={cat.imageUrl} 
+                          alt={cat.name}
+                          style={{ maxWidth: 60, maxHeight: 60, borderRadius: 4, objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)' }}>—</span>
+                      )}
+                    </td>
                     <td>{cat.description ?? '—'}</td>
                     <td>
                       <span className={`badge ${cat.active ? 'badge-green' : 'badge-red'}`}>
@@ -127,6 +139,15 @@ export default function CategoriesList() {
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                />
+              </div>
+              <div className="form-group" style={{ marginBottom: 14 }}>
+                <label>Image URL</label>
+                <input
+                  type="url"
+                  placeholder="https://example.com/image.jpg"
+                  value={form.imageUrl}
+                  onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
                 />
               </div>
               {editing && (

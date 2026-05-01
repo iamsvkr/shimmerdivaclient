@@ -144,8 +144,14 @@ export default function Home() {
                   to={`/shop?categoryId=${cat.id}`}
                   className="category-card"
                   style={{
-                    background:
-                      CATEGORY_GRADIENTS[idx % CATEGORY_GRADIENTS.length],
+                    backgroundImage: cat.imageUrl 
+                      ? `url('${cat.imageUrl}')`
+                      : CATEGORY_GRADIENTS[idx % CATEGORY_GRADIENTS.length],
+                    background: cat.imageUrl
+                      ? `linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 100%), url('${cat.imageUrl}')`
+                      : CATEGORY_GRADIENTS[idx % CATEGORY_GRADIENTS.length],
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                   }}
                 >
                   <div className="category-card-bg" />
