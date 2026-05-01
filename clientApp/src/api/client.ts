@@ -8,17 +8,29 @@ function getToken(): string | null {
 async function request<T>(
   path: string,
   options: RequestInit = {},
+  isAuthRequired = true
 ): Promise<T> {
-  const token = getToken()
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   }
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
+  if (isAuthRequired) {
+    const token = getToken()
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
   }
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+
+  console.log('API Request:', { path, options, isAuthRequired, res })
+
+  if (res.status === 401) {
+    // Handle unauthorized access, e.g., redirect to login
+    localStorage.removeItem('token')
+    window.location.href = '/login'
+    return Promise.reject(new Error('Unauthorized'))
+  }
 
   if (!res.ok) {
     const text = await res.text()
@@ -33,7 +45,7 @@ async function request<T>(
 }
 
 export const api = {
-  get: <T>(path: string) => request<T>(path),
+  get: <T>(path: string, isAuthRequired = true) => request<T>(path, { method: 'GET' }, isAuthRequired),
   post: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
   put: <T>(path: string, body?: unknown) =>

@@ -55,14 +55,14 @@ export const itemsApi = {
     return api.get<PageResponse<Item>>(`/api/v1/admin/items${query}`)
   },
   getPublicAll: (params?: Record<string, string | number>) => {
-    if (!params) return api.get<PageResponse<Item>>('/api/v1/items')
+    if (!params) return api.get<PageResponse<Item>>('/api/v1/items', false)
     const { q, ...rest } = params as Record<string, string | number> & { q?: string }
     if (q) {
       const query = '?' + new URLSearchParams({ q, ...Object.fromEntries(Object.entries(rest).map(([k, v]) => [k, String(v)])) }).toString()
-      return api.get<PageResponse<Item>>(`/api/v1/items/search${query}`)
+      return api.get<PageResponse<Item>>(`/api/v1/items/search${query}`, false)
     }
     const query = '?' + new URLSearchParams(Object.fromEntries(Object.entries(rest).map(([k, v]) => [k, String(v)]))).toString()
-    return api.get<PageResponse<Item>>(`/api/v1/items${query}`)
+    return api.get<PageResponse<Item>>(`/api/v1/items${query}`, false)
   },
   create: (data: CreateItemRequest) => api.post<Item>('/api/v1/admin/items', data),
   update: (id: number, data: Partial<CreateItemRequest>) =>
