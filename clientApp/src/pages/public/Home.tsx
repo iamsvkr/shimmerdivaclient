@@ -88,7 +88,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="hero-scroll">Scroll</div>
       </section>
 
       {/* ── FEATURES ── */}
