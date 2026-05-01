@@ -1,7 +1,7 @@
 import { api } from './client'
 
 export interface StockItem {
-  variantId: number
+  itemVariantId: number
   itemId: number
   itemName: string
   variantInfo?: string
@@ -17,7 +17,7 @@ export interface UpdateStockRequest {
 export const stockApi = {
   getAll: (lowStock?: boolean) => {
     const query = lowStock ? '?lowStock=true' : ''
-    return api.get<StockItem[]>(`/api/v1/admin/stock${query}`)
+    return api.get<StockItem[]>(`/api/v1/stock${query}`, false)
   },
   update: (variantId: number, data: UpdateStockRequest) =>
     api.put<StockItem>(`/api/v1/admin/stock/${variantId}`, data),

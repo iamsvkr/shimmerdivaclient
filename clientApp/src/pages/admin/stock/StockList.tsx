@@ -36,7 +36,7 @@ export default function StockList() {
     if (!editing) return
     setSaving(true)
     try {
-      await stockApi.update(editing.variantId, {
+      await stockApi.update(editing.itemVariantId, {
         quantity: form.quantity,
         restockDate: form.restockDate || undefined,
       })
@@ -91,7 +91,7 @@ export default function StockList() {
               </thead>
               <tbody>
                 {stock.map((item) => (
-                  <tr key={item.variantId}>
+                  <tr key={item.itemVariantId}>
                     <td><strong>{item.itemName}</strong></td>
                     <td>{item.variantInfo ?? '—'}</td>
                     <td>
