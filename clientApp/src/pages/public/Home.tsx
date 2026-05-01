@@ -138,7 +138,7 @@ export default function Home() {
                 gridTemplateColumns: `repeat(auto-fill, minmax(150px, 1fr))`,
               }}
             >
-              {categories.slice(0, 6).map((cat, idx) => (
+              {categories.filter(cat => cat.active).slice(0, 6).map((cat, idx) => (
                 <Link
                   key={cat.id}
                   to={`/shop?categoryId=${cat.id}`}
