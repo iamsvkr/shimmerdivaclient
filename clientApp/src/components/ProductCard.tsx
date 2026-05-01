@@ -111,7 +111,7 @@ export default function ProductCard({ item, onAddToCart }: ProductCardProps) {
           <div className="product-category">{item.category}</div>
         )}
         <div className="product-name">{item.name}</div>
-        {item.material && (
+        {item.material && item.material !== 'NA' && (
           <div className="product-material">{item.material}</div>
         )}
         {item.averageRating ? (
