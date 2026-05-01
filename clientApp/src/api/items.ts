@@ -5,6 +5,7 @@ export interface ItemVariant {
   size?: string
   color?: string
   sku?: string
+  stockQuantity?: number
 }
 
 export interface ItemImage {

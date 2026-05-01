@@ -800,6 +800,26 @@ button { font-family: 'Inter', sans-serif; cursor: pointer; }
   border-radius: 4px;
 }
 
+.product-stock-status {
+  margin-top: 12px;
+  padding: 8px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-radius: var(--radius-sm);
+}
+
+.product-stock-status.low-stock {
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
+}
+
+.product-stock-status.out-of-stock {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
+
 .product-add-btn {
   width: 100%;
   margin-top: 14px;
@@ -819,8 +839,14 @@ button { font-family: 'Inter', sans-serif; cursor: pointer; }
   gap: 8px;
 }
 
-.product-add-btn:hover {
+.product-add-btn:hover:not(:disabled) {
   background: var(--gold-dark);
+}
+
+.product-add-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* =============================================
@@ -1332,6 +1358,26 @@ button { font-family: 'Inter', sans-serif; cursor: pointer; }
   margin-bottom: 28px;
 }
 
+.stock-status-alert {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-radius: var(--radius-sm);
+}
+
+.stock-status-alert.low-stock {
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
+}
+
+.stock-status-alert.out-of-stock {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
+
 .detail-section-label {
   font-size: 12px;
   font-weight: 600;
@@ -1429,13 +1475,20 @@ button { font-family: 'Inter', sans-serif; cursor: pointer; }
   gap: 8px;
 }
 
-.add-to-cart-btn:hover {
+.add-to-cart-btn:hover:not(:disabled) {
   background: var(--gold-dark);
   box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
 }
 
 .add-to-cart-btn.added {
   background: #2e7d32;
+}
+
+.add-to-cart-btn:disabled,
+.add-to-cart-btn.disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .buy-now-btn {

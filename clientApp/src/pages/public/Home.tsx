@@ -6,7 +6,6 @@ import type { Item } from '../../api/items'
 import type { Category } from '../../api/categories'
 import Toast from '../../components/Toast'
 import ProductCard from '../../components/ProductCard'
-import { stockApi } from '../../api/stock'
 
 const CATEGORY_ICONS: Record<string, string> = {
   rings: '💍',
@@ -49,22 +48,17 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState('')
-  const [stocks, setStocks] = useState<any[]>([])
 
   useEffect(() => {
     Promise.allSettled([
       itemsApi.getPublicAll({ size: 8, sortBy: 'createdAt', sortDir: 'desc' }),
       categoriesApi.getAll(),
-      stockApi.getAll(false),
-    ]).then(([items, cats, stocks]) => {
+    ]).then(([items, cats]) => {
       if (items.status === 'fulfilled') setFeaturedItems(items.value?.content ?? [])
       if (cats.status === 'fulfilled') setCategories(cats.value ?? [])
-      if (stocks.status === 'fulfilled') setStocks(stocks.value ?? [])
       setLoading(false)
     })
   }, []);
-
-  console.log('Low stock items:', stocks)
 
   return (
     <>
@@ -197,6 +191,7 @@ export default function Home() {
                   <ProductCard
                     key={item.id}
                     item={item}
+                    categories={categories}
                     onAddToCart={message => setToast(message)}
                   />
                 ))}

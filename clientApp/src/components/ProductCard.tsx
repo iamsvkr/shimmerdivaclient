@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import type { Item } from '../api/items'
 import { useAppDispatch } from '../app/hooks'
 import { addToCart } from '../features/cart/cartSlice'
+import { Category } from '../api/categories'
 
 const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n)
 
 interface ProductCardProps {
   item: Item
+  categories: Category[]
   onAddToCart: (message: string) => void
 }
 
-export default function ProductCard({ item, onAddToCart }: ProductCardProps) {
+export default function ProductCard({ item, categories, onAddToCart }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -22,6 +24,18 @@ export default function ProductCard({ item, onAddToCart }: ProductCardProps) {
   const discount = item.discountPrice && item.price > item.discountPrice
     ? Math.round(((item.price - item.discountPrice) / item.price) * 100)
     : 0
+
+  // Calculate total stock from variants or use direct stock quantity
+  const getTotalStock = () => {
+    if (item.variants && item.variants.length > 0) {
+      return item.variants.reduce((total, variant) => total + (variant.stockQuantity || 0), 0)
+    }
+    return 0
+  }
+
+  const totalStock = getTotalStock()
+  const isOutOfStock = totalStock === 0
+  const showStockWarning = totalStock > 0 && totalStock < 5
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -39,6 +53,7 @@ export default function ProductCard({ item, onAddToCart }: ProductCardProps) {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (isOutOfStock) return
     dispatch(
       addToCart({
         itemId: item.id,
@@ -55,7 +70,7 @@ export default function ProductCard({ item, onAddToCart }: ProductCardProps) {
   return (
     <div
       className="product-card"
-      onClick={() => navigate(`/item/${item.id}`, { state: { item } })}
+      onClick={() => navigate(`/item/${item.id}`, { state: { item, categories } })}
     >
       <div className="product-image-wrap">
         {hasImages ? (
@@ -131,9 +146,16 @@ export default function ProductCard({ item, onAddToCart }: ProductCardProps) {
             <span className="price-save">Save {discount}%</span>
           )}
         </div>
+        {isOutOfStock && (
+          <div className="product-stock-status out-of-stock">Out of stock</div>
+        )}
+        {showStockWarning && (
+          <div className="product-stock-status low-stock">only {totalStock} items left</div>
+        )}
         <button
           className="product-add-btn"
           onClick={handleAddToCart}
+          disabled={isOutOfStock}
         >
           <span>🛍</span> Add to Cart
         </button>

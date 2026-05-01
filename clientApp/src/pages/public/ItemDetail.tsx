@@ -5,6 +5,7 @@ import type { Review } from '../../api/reviews'
 import { useAppDispatch } from '../../app/hooks'
 import { addToCart } from '../../features/cart/cartSlice'
 import Toast from '../../components/Toast'
+import { Category } from '../../api/categories'
 
 const stars = (n: number) => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n))
 
@@ -14,7 +15,8 @@ export default function ItemDetail() {
   const location = useLocation()
   const dispatch = useAppDispatch()
 
-  const locationItem = (location.state as { item?: Item } | null)?.item ?? null
+  const locationItem = (location.state as { item?: Item, categories?: Category[] } | null)?.item ?? null
+  const locationCategories = (location.state as { item?: Item, categories?: Category[] } | null)?.categories ?? []
   const [item, setItem] = useState<Item | null>(locationItem)
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(!locationItem)
@@ -25,6 +27,18 @@ export default function ItemDetail() {
   const [qty, setQty] = useState(1)
   const [toast, setToast] = useState('')
   const [added, setAdded] = useState(false)
+
+  // Calculate total stock from variants
+  const getTotalStock = () => {
+    if (item?.variants && item.variants.length > 0) {
+      return item.variants.reduce((total, variant) => total + (variant.stockQuantity || 0), 0)
+    }
+    return 0
+  }
+
+  const totalStock = getTotalStock()
+  const isOutOfStock = totalStock === 0
+  const showStockWarning = totalStock > 0 && totalStock < 5
 
   useEffect(() => {
     if (!id) return
@@ -44,7 +58,7 @@ export default function ItemDetail() {
   }, [id])
 
   const handleAddToCart = () => {
-    if (!item) return
+    if (!item || isOutOfStock) return
     dispatch(
       addToCart({
         itemId: item.id,
@@ -110,7 +124,7 @@ export default function ItemDetail() {
           <span>›</span>
           {item.category && (
             <>
-              <Link to={`/shop?categoryId=${item.categoryId}`}>{item.category}</Link>
+              <Link to={`/shop?categoryId=${locationCategories.find((cat) => cat.name === item.category)?.id}`}>{item.category}</Link>
               <span>›</span>
             </>
           )}
@@ -204,33 +218,53 @@ export default function ItemDetail() {
               </div>
             )}
 
+            {/* Stock Status */}
+            {isOutOfStock && (
+              <div className="stock-status-alert out-of-stock">Out of stock</div>
+            )}
+            {showStockWarning && (
+              <div className="stock-status-alert low-stock">only {totalStock} items left</div>
+            )}
+
             {/* Qty + Actions */}
-            <div className="detail-section-label">Quantity</div>
-            <div className="qty-row">
-              <div className="qty-control">
-                <button
-                  className="qty-btn"
-                  onClick={() => setQty((q) => Math.max(1, q - 1))}
-                >
-                  −
-                </button>
-                <span className="qty-value">{qty}</span>
-                <button className="qty-btn" onClick={() => setQty((q) => q + 1)}>
-                  +
-                </button>
-              </div>
+            {!isOutOfStock && (
+              <>
+                <div className="detail-section-label">Quantity</div>
+                <div className="qty-row">
+                  <div className="qty-control">
+                    <button
+                      className="qty-btn"
+                      onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    >
+                      −
+                    </button>
+                    <span className="qty-value">{qty}</span>
+                    <button className="qty-btn" onClick={() => setQty((q) => q + 1)}>
+                      +
+                    </button>
+                  </div>
 
+                  <button
+                    className={`add-to-cart-btn${added ? ' added' : ''}`}
+                    onClick={handleAddToCart}
+                  >
+                    {added ? '✓ Added!' : <><span>🛍</span> Add to Cart</>}
+                  </button>
+
+                  <button className="buy-now-btn" onClick={handleBuyNow}>
+                    Buy Now
+                  </button>
+                </div>
+              </>
+            )}
+            {isOutOfStock && (
               <button
-                className={`add-to-cart-btn${added ? ' added' : ''}`}
-                onClick={handleAddToCart}
+                className="add-to-cart-btn disabled"
+                disabled
               >
-                {added ? '✓ Added!' : <><span>🛍</span> Add to Cart</>}
+                <span>🛍</span> Out of Stock
               </button>
-
-              <button className="buy-now-btn" onClick={handleBuyNow}>
-                Buy Now
-              </button>
-            </div>
+            )}
 
             {/* Tags */}
             {tags.length > 0 && (
