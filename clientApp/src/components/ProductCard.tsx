@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Item } from '../api/items'
-import { useAppDispatch } from '../app/hooks'
+import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { addToCart } from '../features/cart/cartSlice'
 import { Category } from '../api/categories'
 
@@ -17,6 +17,7 @@ export default function ProductCard({ item, categories, onAddToCart }: ProductCa
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const cart = useAppSelector(state => state.cart)
 
   const hasImages = item.images && item.images.length > 0
   const currentImage = hasImages ? item.images?.[currentImageIndex] : null
@@ -34,8 +35,15 @@ export default function ProductCard({ item, categories, onAddToCart }: ProductCa
   }
 
   const totalStock = getTotalStock()
-  const isOutOfStock = totalStock === 0
-  const showStockWarning = totalStock > 0 && totalStock < 5
+  
+  // Check if item already exists in cart
+  const itemInCart = cart.items?.find(cartItem => cartItem.itemId === item.id)
+  const quantityInCart = itemInCart?.quantity || 0
+  
+  // Calculate remaining stock after considering cart quantity
+  const remainingStock = totalStock - quantityInCart
+  const isOutOfStock = remainingStock <= 0
+  const showStockWarning = remainingStock > 0 && remainingStock < 5
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -150,7 +158,7 @@ export default function ProductCard({ item, categories, onAddToCart }: ProductCa
           <div className="product-stock-status out-of-stock">Out of stock</div>
         )}
         {showStockWarning && (
-          <div className="product-stock-status low-stock">only {totalStock} items left</div>
+          <div className="product-stock-status low-stock">only {remainingStock} {remainingStock === 1 ? 'item' : 'items'} left</div>
         )}
         <button
           className="product-add-btn"
