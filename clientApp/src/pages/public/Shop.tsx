@@ -8,7 +8,7 @@ import type { Category } from '../../api/categories'
 import type { Material } from '../../api/materials'
 import Toast from '../../components/Toast'
 import ProductCard from '../../components/ProductCard'
-// import { activityApi } from '../../api/activity'
+import { activityApi } from '../../api/activity'
 
 const PAGE_SIZE = 12
 
@@ -57,10 +57,10 @@ export default function Shop() {
   }, [search, categoryId, materialId, minPrice, maxPrice, sortBy, sortDir])
 
   useEffect(() => {
-    // activityApi.logUserActivity({
-    //   activityType: 'visit_shop',
-    //   metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
-    // })
+    activityApi.logUserActivity({
+      activityType: 'visit_shop',
+      metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
+    })
     Promise.allSettled([categoriesApi.getAll(), materialsApi.getAll()]).then(([cats, mats]) => {
       if (cats.status === 'fulfilled') setCategories(cats.value ?? [])
       if (mats.status === 'fulfilled') setMaterials(mats.value ?? [])
