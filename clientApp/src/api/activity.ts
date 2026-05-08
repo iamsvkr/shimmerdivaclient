@@ -16,5 +16,5 @@ export interface LogActivityResponse {
 
 export const activityApi = {
   logUserActivity: (data: UserActivity) =>
-    api.post<LogActivityResponse>(`/api/v1/activity`, data, false),
+    api.post<LogActivityResponse>(`/api/v1/activity`, data),
 }
