@@ -8,7 +8,7 @@ import {
 } from '../../features/cart/cartSlice'
 import type { CartItem } from '../../features/cart/cartSlice'
 import { SHIPPING_FEE, SHIPPING_THRESHOLD } from '../../utils/Constants'
-import { activityApi } from '../../api/activity'
+// import { activityApi } from '../../api/activity'
 
 export default function Cart() {
   const dispatch = useAppDispatch()
@@ -21,10 +21,10 @@ export default function Cart() {
   const [promoApplied, setPromoApplied] = useState('')
 
   useEffect(() => {
-    activityApi.logUserActivity({
-      activityType: 'visit_cart',
-      metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
-    })
+    // activityApi.logUserActivity({
+    //   activityType: 'visit_cart',
+    //   metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
+    // })
   }, [])
 
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE

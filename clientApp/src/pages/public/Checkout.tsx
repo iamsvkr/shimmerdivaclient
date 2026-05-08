@@ -7,7 +7,7 @@ import { paymentApi, initiateRazorpayPayment } from '../../api/payment'
 import { api } from '../../api/client'
 import { authApi } from '../../api/auth'
 import { SHIPPING_FEE, SHIPPING_THRESHOLD } from '../../utils/Constants'
-import { activityApi } from '../../api/activity'
+// import { activityApi } from '../../api/activity'
 
 type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'cod'
 
@@ -74,10 +74,10 @@ export default function Checkout() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    activityApi.logUserActivity({
-      activityType: 'visit_checkout',
-      metadata: JSON.stringify({ timestamp: new Date().toISOString() }) + " items Length: " + items.length,
-    })
+    // activityApi.logUserActivity({
+    //   activityType: 'visit_checkout',
+    //   metadata: JSON.stringify({ timestamp: new Date().toISOString() }) + " items Length: " + items.length,
+    // })
   }, [])
 
   const setAddr = (field: keyof AddressForm, val: string) =>

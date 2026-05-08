@@ -1,4 +1,4 @@
-import { api } from './client'
+// import { api } from './client'
 
 export interface UserActivity {
     sessionId?: string
@@ -14,7 +14,7 @@ export interface LogActivityResponse {
   data?: UserActivity
 }
 
-export const activityApi = {
-  logUserActivity: (data: UserActivity) =>
-    api.post<LogActivityResponse>(`/api/v1/activity`, data),
-}
+// export const activityApi = {
+//   logUserActivity: (data: UserActivity) =>
+//     api.post<LogActivityResponse>(`/api/v1/activity`, data),
+// }
