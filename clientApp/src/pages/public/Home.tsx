@@ -6,6 +6,7 @@ import type { Item } from '../../api/items'
 import type { Category } from '../../api/categories'
 import Toast from '../../components/Toast'
 import ProductCard from '../../components/ProductCard'
+import { activityApi } from '../../api/activity'
 
 const CATEGORY_ICONS: Record<string, string> = {
   rings: '💍',
@@ -50,6 +51,10 @@ export default function Home() {
   const [toast, setToast] = useState('')
 
   useEffect(() => {
+    activityApi.logUserActivity({
+      activityType: 'visit_homepage',
+      metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
+    })
     Promise.allSettled([
       itemsApi.getPublicAll({ size: 8, sortBy: 'createdAt', sortDir: 'desc' }),
       categoriesApi.getAll(),

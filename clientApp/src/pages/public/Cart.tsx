@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import {
@@ -8,6 +8,7 @@ import {
 } from '../../features/cart/cartSlice'
 import type { CartItem } from '../../features/cart/cartSlice'
 import { SHIPPING_FEE, SHIPPING_THRESHOLD } from '../../utils/Constants'
+import { activityApi } from '../../api/activity'
 
 export default function Cart() {
   const dispatch = useAppDispatch()
@@ -18,6 +19,13 @@ export default function Cart() {
   const [promoError, setPromoError] = useState('')
   const [promoDiscount, setPromoDiscount] = useState(0)
   const [promoApplied, setPromoApplied] = useState('')
+
+  useEffect(() => {
+    activityApi.logUserActivity({
+      activityType: 'visit_cart',
+      metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
+    })
+  }, [])
 
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE
   const total = subtotal - promoDiscount + shipping
