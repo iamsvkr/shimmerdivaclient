@@ -46,9 +46,9 @@ async function request<T>(
 
 export const api = {
   get: <T>(path: string, isAuthRequired = true) => request<T>(path, { method: 'GET' }, isAuthRequired),
-  post: <T>(path: string, body?: unknown) =>
-    request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
-  put: <T>(path: string, body?: unknown) =>
-    request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
-  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+  post: <T>(path: string, body?: unknown, isAuthRequired = true) =>
+    request<T>(path, { method: 'POST', body: JSON.stringify(body) }, isAuthRequired),
+  put: <T>(path: string, body?: unknown, isAuthRequired = true) =>
+    request<T>(path, { method: 'PUT', body: JSON.stringify(body) }, isAuthRequired),
+  delete: <T>(path: string, isAuthRequired = true) => request<T>(path, { method: 'DELETE' }, isAuthRequired),
 }
