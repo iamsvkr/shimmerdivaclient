@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
-import type { Item, ItemVariant } from '../../api/items'
+import { itemsApi, type Item, type ItemVariant } from '../../api/items'
 import type { Review } from '../../api/reviews'
 import { useAppDispatch } from '../../app/hooks'
 import { addToCart } from '../../features/cart/cartSlice'
 import Toast from '../../components/Toast'
-import { Category } from '../../api/categories'
+import { categoriesApi, Category } from '../../api/categories'
 
 const stars = (n: number) => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n))
 
@@ -17,6 +17,7 @@ export default function ItemDetail() {
 
   const locationItem = (location.state as { item?: Item, categories?: Category[] } | null)?.item ?? null
   const locationCategories = (location.state as { item?: Item, categories?: Category[] } | null)?.categories ?? []
+  const [categories, setCategories] = useState<Category[]>(locationCategories || []);
   const [item, setItem] = useState<Item | null>(locationItem)
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(!locationItem)
@@ -42,19 +43,26 @@ export default function ItemDetail() {
 
   useEffect(() => {
     if (!id) return
-    fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/v1/items/${id}`)
-      .then((r) => { if (!r.ok) throw new Error(); return r.json() })
-      .then((data: Item) => {
-        setItem(data)
-        if (data.variants?.length) setSelectedVariant(data.variants[0])
-      })
-      .catch(() => { if (!locationItem) setItem(null) })
-      .finally(() => setLoading(false))
+    if (!locationItem) {
+      setLoading(true)
+      itemsApi.getById(parseInt(id), false)
+        .then((data: Item) => {
+          setItem(data)
+          if (data.variants?.length) setSelectedVariant(data.variants[0])
+        })
+        .catch(() => { if (!locationItem) setItem(null) })
+        .finally(() => setLoading(false))
+    }
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/v1/items/${id}/reviews`)
-      .then((r) => r.json())
+    itemsApi.getReviews(parseInt(id))
       .then((data) => setReviews(Array.isArray(data) ? data : data.content ?? []))
       .catch(() => {})
+
+    if (!locationCategories || locationCategories.length === 0) {
+      categoriesApi.getAll()
+        .then((data) => setCategories(data))
+        .catch(() => {})
+    }
   }, [id])
 
   const handleAddToCart = () => {
@@ -124,7 +132,7 @@ export default function ItemDetail() {
           <span>›</span>
           {item.category && (
             <>
-              <Link to={`/shop?categoryId=${locationCategories.find((cat) => cat.name === item.category)?.id}`}>{item.category}</Link>
+              <Link to={`/shop?categoryId=${categories.find((cat) => cat.name === item.category)?.id}`}>{item.category}</Link>
               <span>›</span>
             </>
           )}
@@ -198,7 +206,7 @@ export default function ItemDetail() {
             )}
 
             {/* Variants */}
-            {item.variants && item.variants.length > 0 && (
+            {/* {item.variants && item.variants.length > 0 && (
               <div style={{ marginBottom: 24 }}>
                 <div className="detail-section-label">Select Variant</div>
                 <div className="variants-row">
@@ -216,7 +224,7 @@ export default function ItemDetail() {
                   })}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Stock Status */}
             {isOutOfStock && (

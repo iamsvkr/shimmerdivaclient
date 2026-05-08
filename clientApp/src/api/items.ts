@@ -1,4 +1,5 @@
 import { api } from './client'
+import { Review } from './reviews'
 
 export interface ItemVariant {
   id?: number
@@ -65,6 +66,9 @@ export const itemsApi = {
     const query = '?' + new URLSearchParams(Object.fromEntries(Object.entries(rest).map(([k, v]) => [k, String(v)]))).toString()
     return api.get<PageResponse<Item>>(`/api/v1/items${query}`, false)
   },
+  getById: (id: number, isAdmin = false) =>
+    api.get<Item>(`/api/v1/items/${id}`, !isAdmin),
+  getReviews: (id: number) => api.get<PageResponse<Review>>(`/api/v1/items/${id}/reviews`, false),
   create: (data: CreateItemRequest) => api.post<Item>('/api/v1/admin/items', data),
   update: (id: number, data: Partial<CreateItemRequest>) =>
     api.put<Item>(`/api/v1/admin/items/${id}`, data),
