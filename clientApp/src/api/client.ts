@@ -1,4 +1,4 @@
-// const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+// const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080' || 'https://api.theshimmerdiva.com'
 const BASE_URL = 'https://api.theshimmerdiva.com'
 
 function getToken(): string | null {

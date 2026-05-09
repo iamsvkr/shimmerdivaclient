@@ -6,7 +6,7 @@ import { useAppDispatch } from '../../app/hooks'
 import { addToCart } from '../../features/cart/cartSlice'
 import Toast from '../../components/Toast'
 import { categoriesApi, Category } from '../../api/categories'
-// import { activityApi } from '../../api/activity'
+import { activityApi } from '../../api/activity'
 
 const stars = (n: number) => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n))
 
@@ -43,12 +43,12 @@ export default function ItemDetail() {
   const showStockWarning = totalStock > 0 && totalStock < 5
 
   useEffect(() => {
-    // activityApi.logUserActivity({
-    //   activityType: 'visit_item_detail',
-    //   referenceId: id ? parseInt(id) : undefined,
-    //   referenceType: 'item',
-    //   metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
-    // })
+    activityApi.logUserActivity({
+      activityType: 'PRODUCT_VIEW',
+      referenceId: id ? parseInt(id) : undefined,
+      referenceType: 'item',
+      metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
+    })
     if (!id) return
     if (!locationItem) {
       setLoading(true)
