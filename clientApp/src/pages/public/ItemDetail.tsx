@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
-import { itemsApi, type Item, type ItemVariant } from '../../api/items'
+import { itemsApi, type Item } from '../../api/items'
 import type { Review } from '../../api/reviews'
-import { useAppDispatch } from '../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { addToCart } from '../../features/cart/cartSlice'
 import Toast from '../../components/Toast'
 import { categoriesApi, Category } from '../../api/categories'
@@ -15,6 +15,7 @@ export default function ItemDetail() {
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useAppDispatch()
+  const cart = useAppSelector(state => state.cart)
 
   const locationItem = (location.state as { item?: Item, categories?: Category[] } | null)?.item ?? null
   const locationCategories = (location.state as { item?: Item, categories?: Category[] } | null)?.categories ?? []
@@ -23,9 +24,6 @@ export default function ItemDetail() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(!locationItem)
   const [activeImg, setActiveImg] = useState(0)
-  const [_, setSelectedVariant] = useState<ItemVariant | null>(
-    locationItem?.variants?.[0] ?? null,
-  )
   const [qty, setQty] = useState(1)
   const [toast, setToast] = useState('')
   const [added, setAdded] = useState(false)
@@ -39,8 +37,15 @@ export default function ItemDetail() {
   }
 
   const totalStock = getTotalStock()
-  const isOutOfStock = totalStock === 0
-  const showStockWarning = totalStock > 0 && totalStock < 5
+  
+  // Check if item already exists in cart
+  const itemInCart = cart.items?.find(cartItem => cartItem.itemId === item?.id)
+  const quantityInCart = itemInCart?.quantity || 0
+  
+  // Calculate remaining stock after considering cart quantity
+  const remainingStock = totalStock - quantityInCart
+  const isOutOfStock = remainingStock <= 0
+  const showStockWarning = remainingStock > 0 && remainingStock < 5
 
   useEffect(() => {
     activityApi.logUserActivity({
@@ -55,7 +60,6 @@ export default function ItemDetail() {
       itemsApi.getById(parseInt(id), false)
         .then((data: Item) => {
           setItem(data)
-          if (data.variants?.length) setSelectedVariant(data.variants[0])
         })
         .catch(() => { if (!locationItem) setItem(null) })
         .finally(() => setLoading(false))
@@ -95,7 +99,7 @@ export default function ItemDetail() {
   }
 
   const handleQuantityIncrease = () => {
-    if (qty < totalStock) {
+    if (qty < remainingStock) {
       setQty(qty + 1)
     }
   }
@@ -105,6 +109,12 @@ export default function ItemDetail() {
       setQty(qty - 1)
     }
   }
+
+  useEffect(() => {
+    if (item && remainingStock < qty) {
+      setQty(Math.max(1, remainingStock))
+    }
+  }, [remainingStock, item])
 
   if (loading) {
     return (
