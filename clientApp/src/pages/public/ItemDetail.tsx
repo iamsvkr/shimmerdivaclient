@@ -98,6 +98,18 @@ export default function ItemDetail() {
     navigate('/cart')
   }
 
+  const handleQuantityIncrease = () => {
+    if (qty < totalStock) {
+      setQty(qty + 1)
+    }
+  }
+
+  const handleQuantityDecrease = () => {
+    if (qty > 1) {
+      setQty(qty - 1)
+    }
+  }
+
   if (loading) {
     return (
       <div className="container">
@@ -249,12 +261,12 @@ export default function ItemDetail() {
                   <div className="qty-control">
                     <button
                       className="qty-btn"
-                      onClick={() => setQty((q) => Math.max(1, q - 1))}
+                      onClick={handleQuantityDecrease}
                     >
                       −
                     </button>
                     <span className="qty-value">{qty}</span>
-                    <button className="qty-btn" onClick={() => setQty((q) => q + 1)}>
+                    <button className="qty-btn" onClick={handleQuantityIncrease}>
                       +
                     </button>
                   </div>
