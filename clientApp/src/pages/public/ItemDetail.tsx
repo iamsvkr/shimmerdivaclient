@@ -23,7 +23,7 @@ export default function ItemDetail() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(!locationItem)
   const [activeImg, setActiveImg] = useState(0)
-  const [selectedVariant, setSelectedVariant] = useState<ItemVariant | null>(
+  const [_, setSelectedVariant] = useState<ItemVariant | null>(
     locationItem?.variants?.[0] ?? null,
   )
   const [qty, setQty] = useState(1)
@@ -77,10 +77,6 @@ export default function ItemDetail() {
     dispatch(
       addToCart({
         itemId: item.id,
-        variantId: selectedVariant?.id,
-        variantInfo: selectedVariant
-          ? [selectedVariant.size, selectedVariant.color].filter(Boolean).join(', ')
-          : undefined,
         name: item.name,
         price: item.price,
         discountPrice: item.discountPrice,
