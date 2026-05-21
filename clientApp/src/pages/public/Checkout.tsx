@@ -9,7 +9,7 @@ import { authApi } from '../../api/auth'
 import { SHIPPING_FEE, SHIPPING_THRESHOLD } from '../../utils/Constants'
 import { activityApi } from '../../api/activity'
 
-type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'cod'
+type PaymentMethod = 'card' | 'upi' | 'netbanking'
 
 interface AddressForm {
   fullName: string
@@ -117,52 +117,16 @@ export default function Checkout() {
     setPaymentError('')
 
     try {
-      if (paymentMethod === 'cod') {
-        // COD: find/create user, sync cart, save address, place order
-        let activeToken = token
-        if (!activeToken) {
-          const guestRes = await authApi.guestCheckout(address.email)
-          activeToken = guestRes.token
-          dispatch(setToken(activeToken))
-        }
+      // Online payments follow this sequence:
+      // 1. Ensure user exists (find or create guest account) → get token
+      // 2. Sync local cart items to server
+      // 3. Save address → get addressId
+      // 4. Place order → get orderId
+      // 5. Create Razorpay order with orderId → razorpayId is saved to DB
+      // 6. Verify payment → finds order by razorpayId
 
-        for (const item of items) {
-          await api.post('/api/v1/cart/items', {
-            ...(item.variantId ? { itemVariantId: item.variantId } : { itemId: item.itemId }),
-            quantity: item.quantity,
-          })
-        }
-
-        const addressResponse = await api.post<{ id: number }>('/api/v1/addresses', {
-          line1: address.street,
-          line2: '',
-          city: address.city,
-          state: address.state,
-          pincode: address.zipCode,
-          country: address.country,
-          phone: address.phone,
-          isDefault: true,
-        })
-
-        await api.post('/api/v1/orders', {
-          addressId: addressResponse.id,
-          promoCode: '',
-        })
-
-        setCompletedTotal(total)
-        dispatch(clearCart())
-        setSuccess(true)
-      } else {
-        // For online payments, follow this sequence:
-        // 1. Ensure user exists (find or create guest account) → get token
-        // 2. Sync local cart items to server
-        // 3. Save address → get addressId
-        // 4. Place order → get orderId
-        // 5. Create Razorpay order with orderId → razorpayId is saved to DB
-        // 6. Verify payment → finds order by razorpayId
-
-        // Step 1: Find or create guest user if not logged in
-        let activeToken = token
+      // Step 1: Find or create guest user if not logged in
+      let activeToken = token
         if (!activeToken) {
           const guestRes = await authApi.guestCheckout(address.email)
           activeToken = guestRes.token
@@ -250,7 +214,6 @@ export default function Checkout() {
             setPlacing(false)
           },
         )
-      }
     } catch (error) {
       console.error('Order creation failed:', error)
       setPaymentError(error instanceof Error ? error.message : 'An error occurred. Please try again.')
@@ -301,7 +264,7 @@ export default function Checkout() {
             <div><strong>Payment:</strong> {
               paymentMethod === 'card' ? 'Credit/Debit Card' :
               paymentMethod === 'upi' ? 'UPI' :
-              paymentMethod === 'netbanking' ? 'Net Banking' : 'Cash on Delivery'
+              'Net Banking'
             }</div>
             <div><strong>Amount Paid:</strong> ₹{completedTotal.toLocaleString()}</div>
             <div style={{ marginTop: 8, color: '#2e7d32', fontWeight: 500 }}>
@@ -441,7 +404,6 @@ export default function Checkout() {
                       { value: 'card', label: 'Credit / Debit Card', sub: 'Visa, Mastercard, RuPay', icon: '💳' },
                       { value: 'upi', label: 'UPI', sub: 'GPay, PhonePe, Paytm', icon: '📱' },
                       { value: 'netbanking', label: 'Net Banking', sub: 'All major banks', icon: '🏦' },
-                      { value: 'cod', label: 'Cash on Delivery', sub: 'Pay when delivered', icon: '💵' },
                     ] as { value: PaymentMethod; label: string; sub: string; icon: string }[]).map((m) => (
                       <label
                         key={m.value}
@@ -548,13 +510,6 @@ export default function Checkout() {
                     </div>
                   )}
 
-                  {/* COD note */}
-                  {paymentMethod === 'cod' && (
-                    <div style={{ marginTop: 4, padding: '12px 16px', background: 'var(--cream)', borderRadius: 'var(--radius-sm)', fontSize: 13, color: 'var(--text-muted)' }}>
-                      💵 Cash on Delivery is available for orders up to ₹5,000. Extra ₹40 COD handling fee applies.
-                    </div>
-                  )}
-
                   <div className="security-note" style={{ marginTop: 20 }}>
                     <span>🔒</span>
                     Your payment information is encrypted with 256-bit SSL security
@@ -605,15 +560,9 @@ export default function Checkout() {
                       ) : `₹${shipping}`}
                     </span>
                   </div>
-                  {paymentMethod === 'cod' && (
-                    <div className="summary-row">
-                      <span>COD Fee</span>
-                      <span>₹40</span>
-                    </div>
-                  )}
                   <div className="summary-row total">
                     <span>Total</span>
-                    <span>₹{(total + (paymentMethod === 'cod' ? 40 : 0)).toLocaleString()}</span>
+                    <span>₹{total.toLocaleString()}</span>
                   </div>
 
                   {paymentError && (
@@ -641,7 +590,7 @@ export default function Checkout() {
                         Processing…
                       </>
                     ) : (
-                      <>🔒 Place Order · ₹{(total + (paymentMethod === 'cod' ? 40 : 0)).toLocaleString()}</>
+                      <>🔒 Place Order · ₹{total.toLocaleString()}</>
                     )}
                   </button>
 
