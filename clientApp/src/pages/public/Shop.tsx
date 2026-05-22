@@ -40,12 +40,16 @@ export default function Shop() {
       if (minPrice) params.minPrice = minPrice
       if (maxPrice) params.maxPrice = maxPrice
 
+      console.log('Loading items with params:', { ...params, search })
+
       let res
       if (search.trim()) {
         res = await itemsApi.getPublicAll({ ...params, q: search.trim() })
       } else {
         res = await itemsApi.getPublicAll(params)
       }
+
+      console.log('Loaded items:', res)
       setItems(res?.content ?? [])
       setTotal(res?.totalElements ?? 0)
     } catch {

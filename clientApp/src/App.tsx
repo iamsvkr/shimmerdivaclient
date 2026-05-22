@@ -8,6 +8,10 @@ import Shop from './pages/public/Shop'
 import ItemDetail from './pages/public/ItemDetail'
 import Cart from './pages/public/Cart'
 import Checkout from './pages/public/Checkout'
+import AboutUs from './pages/public/AboutUs'
+import TermsAndConditions from './pages/public/TermsAndConditions'
+import DeliveryAndReturns from './pages/public/DeliveryAndReturns'
+import PrivacyPolicy from './pages/public/PrivacyPolicy'
 
 // Auth
 import Login from './pages/Login'
@@ -32,6 +36,10 @@ export const App = () => (
       <Route path="/item/:id" element={<ItemDetail />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
+      <Route path="/about" element={<AboutUs />} />
+      <Route path="/terms" element={<TermsAndConditions />} />
+      <Route path="/delivery-returns" element={<DeliveryAndReturns />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
     </Route>
 
     {/* Auth */}

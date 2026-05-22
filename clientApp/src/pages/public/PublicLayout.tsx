@@ -86,19 +86,19 @@ export default function PublicLayout() {
               <h4>Shop</h4>
               <ul>
                 <li><a href="/shop">All Jewellery</a></li>
-                <li><a href="/shop?category=rings">Rings</a></li>
-                <li><a href="/shop?category=necklaces">Necklaces</a></li>
-                <li><a href="/shop?category=earrings">Earrings</a></li>
-                <li><a href="/shop?category=bracelets">Bracelets</a></li>
+                <li><a href="/shop?categoryId=1">Rings</a></li>
+                <li><a href="/shop?categoryId=7">Necklaces</a></li>
+                <li><a href="/shop?categoryId=4">Earrings</a></li>
+                <li><a href="/shop?categoryId=3">Bracelets</a></li>
               </ul>
             </div>
             <div className="footer-col">
-              <h4>Help</h4>
+              <h4>Information</h4>
               <ul>
-                <li><a href="#">Size Guide</a></li>
-                <li><a href="#">Care Instructions</a></li>
-                <li><a href="#">Shipping Info</a></li>
-                <li><a href="#">Returns Policy</a></li>
+                <li><Link to="/about">About Us</Link></li>
+                <li><Link to="/terms">Terms & Conditions</Link></li>
+                <li><Link to="/delivery-returns">Delivery & Returns</Link></li>
+                <li><Link to="/privacy">Privacy Policy</Link></li>
               </ul>
             </div>
             <div className="footer-col">

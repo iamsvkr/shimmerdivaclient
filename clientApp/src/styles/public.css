@@ -2367,3 +2367,129 @@ button { font-family: 'Inter', sans-serif; cursor: pointer; }
   .category-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .features-grid { grid-template-columns: 1fr; }
 }
+
+/* =============================================
+   INFO PAGES (About, Terms, Privacy, Returns)
+   ============================================= */
+.info-page {
+  background: var(--cream);
+  padding: 60px 0;
+  min-height: calc(100vh - 72px - 400px);
+}
+
+.info-header {
+  text-align: center;
+  margin-bottom: 56px;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-header h1 {
+  font-size: clamp(32px, 5vw, 48px);
+  color: var(--black);
+  margin-bottom: 12px;
+}
+
+.info-header .subtitle {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.info-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.info-section {
+  margin-bottom: 48px;
+}
+
+.info-section h2 {
+  font-size: 24px;
+  color: var(--black);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.info-section p {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+
+.info-section ul,
+.info-section ol {
+  margin-left: 24px;
+  margin-bottom: 16px;
+}
+
+.info-section ul li,
+.info-section ol li {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 10px;
+}
+
+.values-list {
+  list-style: none;
+  margin-left: 0;
+  margin-bottom: 16px;
+}
+
+.values-list li {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 12px;
+  padding-left: 24px;
+  position: relative;
+}
+
+.values-list li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+  font-size: 12px;
+}
+
+.return-steps {
+  list-style: decimal;
+  margin-left: 24px;
+  margin-bottom: 16px;
+}
+
+.return-steps li {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .info-page {
+    padding: 40px 0;
+  }
+
+  .info-header {
+    padding: 24px 0;
+    margin-bottom: 40px;
+  }
+
+  .info-header h1 {
+    font-size: 28px;
+  }
+
+  .info-section {
+    margin-bottom: 36px;
+  }
+
+  .info-section h2 {
+    font-size: 20px;
+  }
+}
