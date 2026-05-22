@@ -1,13 +1,18 @@
-import { useState } from 'react'
-import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { NavLink, Link, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 import { selectCartCount } from '../../features/cart/cartSlice'
 
 export default function PublicLayout() {
   const cartCount = useAppSelector(selectCartCount)
   const navigate = useNavigate()
+  const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchQ, setSearchQ] = useState('')
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
