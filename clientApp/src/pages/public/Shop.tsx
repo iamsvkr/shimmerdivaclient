@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { itemsApi } from '../../api/items'
 import { categoriesApi } from '../../api/categories'
-import { materialsApi } from '../../api/materials'
+// import { materialsApi } from '../../api/materials'
 import type { Item } from '../../api/items'
 import type { Category } from '../../api/categories'
-import type { Material } from '../../api/materials'
+// import type { Material } from '../../api/materials'
 import Toast from '../../components/Toast'
 import ProductCard from '../../components/ProductCard'
 
@@ -19,7 +19,7 @@ export default function Shop() {
   const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<Category[]>([])
-  const [materials, setMaterials] = useState<Material[]>([])
+  // const [_, setMaterials] = useState<Material[]>([])
   const [toast, setToast] = useState('')
 
   // Filter state
@@ -56,9 +56,9 @@ export default function Shop() {
   }, [search, categoryId, materialId, minPrice, maxPrice, sortBy, sortDir])
 
   useEffect(() => {
-    Promise.allSettled([categoriesApi.getAll(), materialsApi.getAll()]).then(([cats, mats]) => {
+    Promise.allSettled([categoriesApi.getAll()]).then(([cats]) => {
       if (cats.status === 'fulfilled') setCategories(cats.value ?? [])
-      if (mats.status === 'fulfilled') setMaterials(mats.value ?? [])
+      // if (mats.status === 'fulfilled') setMaterials(mats.value ?? [])
     })
   }, [])
 
@@ -149,7 +149,7 @@ export default function Shop() {
               )}
 
               {/* Material */}
-              {materials.length > 0 && (
+              {/* {materials.length > 0 && (
                 <div className="filter-group">
                   <div className="filter-group-title">Material</div>
                   <label className="filter-option">
@@ -175,7 +175,7 @@ export default function Shop() {
                     </label>
                   ))}
                 </div>
-              )}
+              )} */}
 
               {/* Price */}
               <div className="filter-group">
