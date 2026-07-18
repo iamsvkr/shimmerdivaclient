@@ -12,6 +12,7 @@ const navItems = [
   { to: '/admin/stock', label: 'Stock', icon: '▣' },
   { to: '/admin/promocodes', label: 'Promo Codes', icon: '◈' },
   { to: '/admin/reviews', label: 'Reviews', icon: '★' },
+  { to: '/admin/hero', label: 'Hero Banners', icon: '▤' },
 ]
 
 export default function AdminLayout() {

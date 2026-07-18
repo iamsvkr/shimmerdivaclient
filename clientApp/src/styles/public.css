@@ -279,6 +279,53 @@ button { font-family: 'Inter', sans-serif; cursor: pointer; }
   background: linear-gradient(135deg, #0d0d1a 0%, #1a1228 40%, #2a1a0e 100%);
 }
 
+/* ── Image carousel layer (behind hero-bg overlay) ── */
+.hero-images-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-image-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.hero-image-slide.active {
+  opacity: 1;
+}
+
+/* ── Navigation dots ── */
+.hero-image-dots {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.hero-image-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 168, 76, 0.6);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.hero-image-dot.active {
+  background: var(--gold, #c9a84c);
+  transform: scale(1.25);
+}
+
 .hero-bg {
   position: absolute;
   inset: 0;

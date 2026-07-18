@@ -26,6 +26,7 @@ import OrdersList from './pages/admin/orders/OrdersList'
 import StockList from './pages/admin/stock/StockList'
 import PromoCodesList from './pages/admin/promocodes/PromoCodesList'
 import ReviewsList from './pages/admin/reviews/ReviewsList'
+import HeroBannersList from './pages/admin/hero/HeroBannersList'
 
 export const App = () => (
   <Routes>
@@ -62,6 +63,7 @@ export const App = () => (
       <Route path="stock" element={<StockList />} />
       <Route path="promocodes" element={<PromoCodesList />} />
       <Route path="reviews" element={<ReviewsList />} />
+      <Route path="hero" element={<HeroBannersList />} />
     </Route>
 
     <Route path="*" element={<Navigate to="/" replace />} />

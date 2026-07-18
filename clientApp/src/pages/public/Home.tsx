@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { itemsApi } from '../../api/items'
 import { categoriesApi } from '../../api/categories'
+import { heroBannersApi } from '../../api/heroBanners'
 import type { Item } from '../../api/items'
 import type { Category } from '../../api/categories'
+import type { HeroBanner } from '../../api/heroBanners'
 import Toast from '../../components/Toast'
 import ProductCard from '../../components/ProductCard'
 import { activityApi } from '../../api/activity'
@@ -44,11 +46,28 @@ const TESTIMONIALS = [
 
 const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n)
 
+function renderHeading(headingMain: string, headingHighlight: string) {
+  if (!headingHighlight || !headingMain.includes(headingHighlight)) {
+    return <>{headingMain}</>
+  }
+  const parts = headingMain.split(headingHighlight)
+  return (
+    <>
+      {parts[0]}
+      <span className="highlight">{headingHighlight}</span>
+      {parts[1]}
+    </>
+  )
+}
+
 export default function Home() {
   const [featuredItems, setFeaturedItems] = useState<Item[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [heroBanners, setHeroBanners] = useState<HeroBanner[]>([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState('')
+  const [activeImageIndexes, setActiveImageIndexes] = useState<Record<number, number>>({})
+  const intervalsRef = useRef<Record<number, ReturnType<typeof setInterval>>>({})
 
   useEffect(() => {
     activityApi.logUserActivity({
@@ -58,42 +77,122 @@ export default function Home() {
     Promise.allSettled([
       itemsApi.getPublicAll({ size: 8, sortBy: 'createdAt', sortDir: 'desc' }),
       categoriesApi.getAll(),
-    ]).then(([items, cats]) => {
+      heroBannersApi.getActive(),
+    ]).then(([items, cats, banners]) => {
       if (items.status === 'fulfilled') setFeaturedItems(items.value?.content ?? [])
       if (cats.status === 'fulfilled') setCategories(cats.value ?? [])
+      if (banners.status === 'fulfilled') {
+        const data = banners.value ?? []
+        setHeroBanners(data)
+        const initial: Record<number, number> = {}
+        data.forEach(b => { initial[b.id] = 0 })
+        setActiveImageIndexes(initial)
+      }
       setLoading(false)
     })
-  }, []);
+  }, [])
+
+  // Start per-banner image rotation intervals
+  useEffect(() => {
+    const intervals = intervalsRef.current
+    heroBanners.forEach(banner => {
+      if (banner.images.length > 1) {
+        intervals[banner.id] = setInterval(() => {
+          setActiveImageIndexes(prev => ({
+            ...prev,
+            [banner.id]: (prev[banner.id] + 1) % banner.images.length,
+          }))
+        }, 5000)
+      }
+    })
+    return () => {
+      Object.values(intervals).forEach(clearInterval)
+      intervalsRef.current = {}
+    }
+  }, [heroBanners])
 
   return (
     <>
-      {/* ── HERO ── */}
-      <section className="hero">
-        <div className="hero-bg" />
-        <div className="hero-pattern" />
-        <div className="container">
-          <div className="hero-content">
-            <div className="hero-badge">
-              New Collection {new Date().getFullYear()}
-            </div>
-            <h1>
-              Where Every Piece
-              <br />
-              Tells a <span className="highlight">Story</span>
-            </h1>
-            <p>
-              Discover our unique jewellery collection — from timeless western
-              classics to contemporary traditional designs. Made for the woman who
-              knows her worth.
-            </p>
-            <div className="hero-actions">
-              <Link to="/shop">
-                <button className="btn-gold">Shop Collection →</button>
-              </Link>
+      {/* ── HERO BANNERS ── */}
+      {heroBanners.length > 0 ? (
+        heroBanners.map(banner => {
+          const activeIdx = activeImageIndexes[banner.id] ?? 0
+          return (
+            <section key={banner.id} className="hero">
+              {/* Background image slides */}
+              {banner.images.length > 0 && (
+                <div className="hero-images-wrapper">
+                  {banner.images.map((img, idx) => (
+                    <div
+                      key={img.id}
+                      className={`hero-image-slide${idx === activeIdx ? ' active' : ''}`}
+                      style={{ backgroundImage: `url('${img.imageUrl}')` }}
+                    />
+                  ))}
+                </div>
+              )}
+              <div className="hero-bg" />
+              <div className="hero-pattern" />
+              <div className="container">
+                <div className="hero-content">
+                  {banner.badgeText && (
+                    <div className="hero-badge">{banner.badgeText}</div>
+                  )}
+                  <h1>{renderHeading(banner.headingMain, banner.headingHighlight)}</h1>
+                  {banner.description && <p>{banner.description}</p>}
+                  {banner.buttonText && banner.buttonLink && (
+                    <div className="hero-actions">
+                      <Link to={banner.buttonLink}>
+                        <button className="btn-gold">{banner.buttonText}</button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {banner.images.length > 1 && (
+                <div className="hero-image-dots">
+                  {banner.images.map((img, idx) => (
+                    <button
+                      key={img.id}
+                      className={`hero-image-dot${idx === activeIdx ? ' active' : ''}`}
+                      onClick={() => setActiveImageIndexes(prev => ({ ...prev, [banner.id]: idx }))}
+                      aria-label={`Go to image ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          )
+        })
+      ) : (
+        /* Static fallback when no banners configured */
+        <section className="hero">
+          <div className="hero-bg" />
+          <div className="hero-pattern" />
+          <div className="container">
+            <div className="hero-content">
+              <div className="hero-badge">
+                New Collection {new Date().getFullYear()}
+              </div>
+              <h1>
+                Where Every Piece
+                <br />
+                Tells a <span className="highlight">Story</span>
+              </h1>
+              <p>
+                Discover our unique jewellery collection — from timeless western
+                classics to contemporary traditional designs. Made for the woman who
+                knows her worth.
+              </p>
+              <div className="hero-actions">
+                <Link to="/shop">
+                  <button className="btn-gold">Shop Collection →</button>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── FEATURES ── */}
       <div className="features-strip">
