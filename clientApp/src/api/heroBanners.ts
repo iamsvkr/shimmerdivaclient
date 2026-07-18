@@ -33,7 +33,7 @@ export interface HeroBannerRequest {
 
 export const heroBannersApi = {
   // Public
-  getActive: () => api.get<HeroBanner[]>('/api/v1/public/hero-banners', false),
+  getActive: () => api.get<HeroBanner[]>('/api/v1/hero-banners', false),
 
   // Admin
   getAll: () => api.get<HeroBanner[]>('/api/v1/admin/hero-banners'),
