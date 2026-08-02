@@ -86,6 +86,7 @@ export default function ItemDetail() {
         discountPrice: item.discountPrice,
         imageUrl: item.images?.[0]?.imageUrl,
         quantity: qty,
+        categoryId: item.categoryId,
       }),
     )
     setAdded(true)
