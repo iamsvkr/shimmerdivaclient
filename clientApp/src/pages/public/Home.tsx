@@ -111,6 +111,15 @@ export default function Home() {
     }
   }, [heroBanners])
 
+  if (loading) {
+    return <div id="page-loader" className="loader-container">
+        <div className="loader-content">
+            <div className="spinner"></div>
+            <div className="loader-text">Loading, please wait...</div>
+        </div>
+    </div>
+  }
+
   return (
     <>
       {/* ── HERO BANNERS ── */}
