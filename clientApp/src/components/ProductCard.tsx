@@ -70,7 +70,7 @@ export default function ProductCard({ item, categories, onAddToCart }: ProductCa
         discountPrice: item.discountPrice,
         imageUrl: item.images?.[0]?.imageUrl,
         quantity: 1,
-        categoryId: item.categoryId,
+        categoryId: categories.find(cat => cat.name === item.category)?.id,
       }),
     )
     onAddToCart(`${item.name} added to cart`)
