@@ -6,8 +6,8 @@ import { setToken } from '../../features/auth/authSlice'
 import { paymentApi, initiateRazorpayPayment } from '../../api/payment'
 import { api } from '../../api/client'
 import { authApi } from '../../api/auth'
-import { SHIPPING_FEE, SHIPPING_THRESHOLD, RAKHI_CATEGORY_ID } from '../../utils/Constants'
 import { activityApi } from '../../api/activity'
+import { calculateShipping } from '../../utils/shipping'
 
 type PaymentMethod = 'card' | 'upi' | 'netbanking'
 
@@ -51,8 +51,7 @@ export default function Checkout() {
   const items = useAppSelector((state) => state.cart.items)
   const token = useAppSelector((state) => state.auth.token)
   const subtotal = useAppSelector(selectCartTotal)
-  const hasRakhiItem = items.some((i) => i.categoryId === RAKHI_CATEGORY_ID)
-  const shipping = hasRakhiItem || subtotal < SHIPPING_THRESHOLD ? SHIPPING_FEE : 0
+  const shipping = calculateShipping(items, subtotal)
   const total = subtotal + shipping
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card')

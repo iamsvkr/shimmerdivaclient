@@ -1,3 +1,4 @@
 export const SHIPPING_THRESHOLD = 500
 export const SHIPPING_FEE = 99
 export const RAKHI_CATEGORY_ID = 9
+export const CUSTOMISED_HAMPERS_CATEGORY_ID = 10

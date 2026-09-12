@@ -7,7 +7,8 @@ import {
   selectCartTotal,
 } from '../../features/cart/cartSlice'
 import type { CartItem } from '../../features/cart/cartSlice'
-import { SHIPPING_FEE, SHIPPING_THRESHOLD, RAKHI_CATEGORY_ID } from '../../utils/Constants'
+import { SHIPPING_THRESHOLD, RAKHI_CATEGORY_ID, CUSTOMISED_HAMPERS_CATEGORY_ID } from '../../utils/Constants'
+import { calculateShipping } from '../../utils/shipping'
 // import { activityApi } from '../../api/activity'
 
 export default function Cart() {
@@ -28,7 +29,8 @@ export default function Cart() {
   }, [])
 
   const hasRakhiItem = items.some((i) => i.categoryId === RAKHI_CATEGORY_ID)
-  const shipping = hasRakhiItem || subtotal < SHIPPING_THRESHOLD ? SHIPPING_FEE : 0
+  const hasCustomisedHampersItem = items.some((i) => i.categoryId === CUSTOMISED_HAMPERS_CATEGORY_ID)
+  const shipping = calculateShipping(items, subtotal)
   const total = subtotal - promoDiscount + shipping
 
   const handleQty = (item: CartItem, qty: number) => {
@@ -180,7 +182,7 @@ export default function Cart() {
             </span>
           </div>
 
-          {shipping > 0 && !hasRakhiItem && (
+          {shipping > 0 && !hasRakhiItem && !hasCustomisedHampersItem && (
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: -4, marginBottom: 8 }}>
               Add ₹{(SHIPPING_THRESHOLD - subtotal).toLocaleString()} more for free shipping
             </p>
