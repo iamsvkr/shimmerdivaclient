@@ -3,10 +3,11 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
 import authReducer from "../features/auth/authSlice"
 import cartReducer from "../features/cart/cartSlice"
+import heroBannerReducer from "../features/image/heroBannerSlice"
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices({ auth: authReducer, cart: cartReducer })
+const rootReducer = combineSlices({ auth: authReducer, cart: cartReducer, heroBanner: heroBannerReducer })
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>
 

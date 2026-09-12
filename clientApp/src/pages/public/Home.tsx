@@ -5,10 +5,11 @@ import { categoriesApi } from '../../api/categories'
 import { heroBannersApi } from '../../api/heroBanners'
 import type { Item } from '../../api/items'
 import type { Category } from '../../api/categories'
-import type { HeroBanner } from '../../api/heroBanners'
 import Toast from '../../components/Toast'
 import ProductCard from '../../components/ProductCard'
 import { activityApi } from '../../api/activity'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { setHeroBanners } from '../../features/image/heroBannerSlice'
 
 const CATEGORY_ICONS: Record<string, string> = {
   rings: '💍',
@@ -61,15 +62,19 @@ function renderHeading(headingMain: string, headingHighlight: string) {
 }
 
 export default function Home() {
+  const dispatch = useAppDispatch()
+
   const [featuredItems, setFeaturedItems] = useState<Item[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [heroBanners, setHeroBanners] = useState<HeroBanner[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(0)
   const [toast, setToast] = useState('')
   const [activeImageIndexes, setActiveImageIndexes] = useState<Record<number, number>>({})
   const intervalsRef = useRef<Record<number, ReturnType<typeof setInterval>>>({})
 
+  const heroBanners = useAppSelector(state => state.heroBanner.heroBanners)
+
   useEffect(() => {
+    setLoading((s) => s + 1)
     activityApi.logUserActivity({
       activityType: 'PAGE_VIEW',
       metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
@@ -83,19 +88,48 @@ export default function Home() {
       if (cats.status === 'fulfilled') setCategories(cats.value ?? [])
       if (banners.status === 'fulfilled') {
         const data = banners.value ?? []
-        setHeroBanners(data)
+        dispatch(setHeroBanners(data))
         const initial: Record<number, number> = {}
         data.forEach(b => { initial[b.id] = 0 })
         setActiveImageIndexes(initial)
       }
-      setLoading(false)
+      setLoading((s) => s - 1)
     })
   }, [])
+
+  useEffect(() => {
+    if (heroBanners != null) {
+      console.log('***here1')
+      const initial: Record<number, number> = {}
+      heroBanners.forEach(b => { initial[b.id] = 0 })
+      setActiveImageIndexes(initial)
+      return;
+    }
+    setLoading((s) => s + 1)
+    activityApi.logUserActivity({
+      activityType: 'PAGE_VIEW',
+      metadata: JSON.stringify({ timestamp: new Date().toISOString() }),
+    })
+    Promise.allSettled([
+      heroBannersApi.getActive(),
+    ]).then(([banners]) => {
+      if (banners.status === 'fulfilled') {
+        const data = banners.value ?? []
+        dispatch(setHeroBanners(data))
+        const initial: Record<number, number> = {}
+        data.forEach(b => { initial[b.id] = 0 })
+        setActiveImageIndexes(initial)
+      }
+      setLoading((s) => s - 1)
+    })
+  }, [])
+
+  console.log('heroBanners:', heroBanners, loading)
 
   // Start per-banner image rotation intervals
   useEffect(() => {
     const intervals = intervalsRef.current
-    heroBanners.forEach(banner => {
+    heroBanners?.forEach(banner => {
       if (banner.images.length > 1) {
         intervals[banner.id] = setInterval(() => {
           setActiveImageIndexes(prev => ({
@@ -123,8 +157,8 @@ export default function Home() {
   return (
     <>
       {/* ── HERO BANNERS ── */}
-      {heroBanners.length > 0 ? (
-        heroBanners.map(banner => {
+      {(heroBanners && heroBanners.length > 0) ? (
+        heroBanners?.map(banner => {
           const activeIdx = activeImageIndexes[banner.id] ?? 0
           return (
             <section key={banner.id} className="hero">
