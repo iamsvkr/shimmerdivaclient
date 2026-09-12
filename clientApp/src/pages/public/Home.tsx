@@ -99,7 +99,6 @@ export default function Home() {
 
   useEffect(() => {
     if (heroBanners != null) {
-      console.log('***here1')
       const initial: Record<number, number> = {}
       heroBanners.forEach(b => { initial[b.id] = 0 })
       setActiveImageIndexes(initial)
@@ -123,8 +122,6 @@ export default function Home() {
       setLoading((s) => s - 1)
     })
   }, [])
-
-  console.log('heroBanners:', heroBanners, loading)
 
   // Start per-banner image rotation intervals
   useEffect(() => {
